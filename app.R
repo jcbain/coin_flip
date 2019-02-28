@@ -37,6 +37,9 @@ ui <- cartridge(
     imageOutput("flip_tracker_3", width = "2%", inline = T, height = "20px")
   ),
   container(
+    uiOutput("doge_image")
+  ),
+  container(
     container(imageOutput("flip_image")),
     button_primary("flip", "flipity")
   )
@@ -165,6 +168,23 @@ server <- function(input, output, session) {
         alt = "tails"
       ))
     }}, deleteFile = FALSE)
+  
+  c_url <- reactive({
+    paste0("www/doge.png")
+  })
+  output$doge_image <- renderUI({
+    tagList(
+      balloon("Flip", style = "margin-left: 40px;"),
+      tags$br(),
+      tags$img(
+        src = c_url(),
+        filetype = "image/png",
+        width = 40,
+        height = 40,
+        alt = "tails")
+    )
+  })
+  
     
 }
 
