@@ -43,8 +43,10 @@ ui <- cartridge(
 )
 
 server <- function(input, output, session) {
+  all_flips <- reactiveValues()
   # current flip count
   flip_count <- reactiveVal(1)
+  flip_count2 <- reactiveVal(1)
   
   # Actions that occur when flip button is pushed
   ## takes the first n rows determined by flip_count()
@@ -54,6 +56,15 @@ server <- function(input, output, session) {
     flip_count(flip_count() + 1L)
     
     flip()
+  })
+  
+  flip_gatherer <- eventReactive(input$flip, {
+    flip_index <- paste0("flip_", flip_count2())
+    flip <- reactiveVal(flips[flip_count2(),] %>% pull(heads))
+    all_flips[[flip_index]] <- flip()
+    flip_count2(flip_count2() + 1L)
+    
+    all_flips
   })
   
   # Generate a series of random flips
@@ -80,10 +91,31 @@ server <- function(input, output, session) {
       theme_bw()
     })
   
-  output$flip_tracker <- renderImage({
-    if (is.null(flip_event()))
+  output$flip_tracker_1 <- renderImage({
+    if (is.null(flip_gatherer()[["flip_1"]]))
       return(NULL)
-    if (flip_event() %>% tail(1) %>% pull(heads) == 0) {
+    if (flip_gatherer()[["flip_1"]] == 0) {
+      return(list(
+        src = "www/dogecoin-png-5.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "heads"
+      ))
+    } else {
+      return(list(
+        src = "www/bitcoins.png",
+        filetype = "image/png",
+        width = 40,
+        height = 40,
+        alt = "tails"
+      ))
+    }}, deleteFile = FALSE)
+  
+  output$flip_tracker_2 <- renderImage({
+    if (is.null(flip_gatherer()[["flip_2"]]))
+      return(NULL)
+    if (flip_gatherer()[["flip_2"]] == 0) {
       return(list(
         src = "www/dogecoin-png-5.png",
         filetype = "image/png",
