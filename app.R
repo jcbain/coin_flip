@@ -169,23 +169,15 @@ server <- function(input, output, session) {
       ))
     }}, deleteFile = FALSE)
   
-  c_url <- reactive({
-    paste0("www/doge.png")
-  })
+
   output$doge_image <- renderUI({
     tagList(
       balloon("Flip", style = "margin-left: 40px;"),
       tags$br(),
-      tags$img(
-        src = c_url(),
-        filetype = "image/png",
-        width = 40,
-        height = 40,
-        alt = "tails")
+      tags$img(src = "www.rstudio.com")
     )
   })
   
-    
 }
 
-shiny::shinyApp(ui, server)
+#shiny::shinyApp(ui, server)
