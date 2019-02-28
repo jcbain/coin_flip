@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1551311727502.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "2DA7F94C",
+    "lastKnownWriteTime" : 1551333725,
+    "last_content_update" : 1551333725615,
+    "path" : "~/Desktop/coin_flip/app.R",
+    "project_path" : "app.R",
+    "properties" : {
+        "cursorPosition" : "113,0",
+        "scrollLine" : "94",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
