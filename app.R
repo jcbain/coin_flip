@@ -32,13 +32,24 @@ ui <- cartridge(
   ),
   cartridge(title = "flipity"),
   container(
-    container(imageOutput("image2")),
+    container(imageOutput("flip_image")),
     button_primary("flip", "flipity")
   )
 )
 
 server <- function(input, output, session) {
-  score <- reactiveVal(1)
+  
+  flip_count <- reactiveVal(1)
+  
+  # Actions that occur when flip button is pushed
+  ## takes the first n rows determined by flip_count()
+  ## increments flip_count() by 1
+  flip_event <- eventReactive(input$flip, {
+    flip <- reactiveVal(flips %>% head(flip_count()))
+    flip_count(flip_count() + 1L)
+    
+    flip()
+  })
   
   
   tmp_dat <- reactive({
@@ -63,17 +74,10 @@ server <- function(input, output, session) {
       theme_bw()
     })
   
-  flip_event <- eventReactive(input$flip, {
-    flip <- reactiveVal(flips %>% head(score()))
-    score(score() + 1L)
-    
-    flip()
-  })
-  
-  output$image2<-renderImage({
+  output$flip_image <- renderImage({
     if (is.null(flip_event()))
       return(NULL)
-    if (flip_event() %>% tail(1) %>% pull() == 0) {
+    if (flip_event() %>% tail(1) %>% pull(heads) == 0) {
       return(list(
         src = "face.png",
         contentType = "image/png",
@@ -87,27 +91,6 @@ server <- function(input, output, session) {
       ))
     }}, deleteFile = FALSE)
     
-  
-#   # image2 sends pre-rendered images
-#   output$image2 <- renderImage({
-#     if (is.null(input$picture))
-#       return(NULL)
-#     
-#     if (input$picture == "face") {
-#       return(list(
-#         src = "images/face.png",
-#         contentType = "image/png",
-#         alt = "Face"
-#       ))
-#     } else if (input$picture == "chainring") {
-#       return(list(
-#         src = "images/chainring.jpg",
-#         filetype = "image/jpeg",
-#         alt = "This is a chainring"
-#       ))
-#     }
-#     
-#   }, deleteFile = FALSE)
 }
 
 shiny::shinyApp(ui, server)
