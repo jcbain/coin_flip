@@ -32,9 +32,9 @@ ui <- cartridge(
   ),
   cartridge(title = "flipity"),
   container(
-    imageOutput("flip_tracker_1"),
-    imageOutput("flip_tracker_2"),
-    imageOutput("flip_tracker_3")
+    imageOutput("flip_tracker_1", width = "2%", inline = T, height = "20px"),
+    imageOutput("flip_tracker_2", width = "2%", inline = T, height = "20px"),
+    imageOutput("flip_tracker_3", width = "2%", inline = T, height = "20px")
   ),
   container(
     container(imageOutput("flip_image")),
@@ -43,7 +43,7 @@ ui <- cartridge(
 )
 
 server <- function(input, output, session) {
-  all_flips <- reactiveValues()
+  all_flips <- reactiveValues('flip_1' = 'empty', 'flip_2' = 'empty')
   # current flip count
   flip_count <- reactiveVal(1)
   flip_count2 <- reactiveVal(1)
@@ -92,8 +92,14 @@ server <- function(input, output, session) {
     })
   
   output$flip_tracker_1 <- renderImage({
-    if (is.null(flip_gatherer()[["flip_1"]]))
-      return(NULL)
+    if (flip_gatherer()[['flip_1']]=="empty")
+      return(list(
+        src = "www/grey-circle-png-1.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "none"
+      ))
     if (flip_gatherer()[["flip_1"]] == 0) {
       return(list(
         src = "www/dogecoin-png-5.png",
@@ -113,8 +119,14 @@ server <- function(input, output, session) {
     }}, deleteFile = FALSE)
   
   output$flip_tracker_2 <- renderImage({
-    if (is.null(flip_gatherer()[["flip_2"]]))
-      return(NULL)
+    if (flip_gatherer()[['flip_2']]=="empty")
+      return(list(
+        src = "www/grey-circle-png-1.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "none"
+      ))
     if (flip_gatherer()[["flip_2"]] == 0) {
       return(list(
         src = "www/dogecoin-png-5.png",
