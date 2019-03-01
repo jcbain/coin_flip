@@ -146,6 +146,7 @@ server <- function(input, output) {
         condition_met(TRUE)
         }}
     flip_count3(flip_count3() + 1L)
+    flip_count4(flip_count4() + 1L)
   })
   
   
@@ -182,12 +183,12 @@ server <- function(input, output) {
   
   output$flip_collection <- renderPlot({
     pre_tmp <- flips %>% filter(trial < trial_index())
-    cur_tmp <- trial_data()  %>% head(flip_count4())
+    cur_tmp <- trial_data() %>% head(flip_count4())
     tmp <- bind_rows(pre_tmp, cur_tmp) %>% 
       group_by(trial) %>% summarize(first_hh = which(hh)[1] + 1)
-    plt <- ggplot(data = tmp, aes(x = first_hh)) + theme_bw()
+    plt <- ggplot(data = tmp, aes(x = first_hh)) + geom_histogram() + theme_bw()
     
-    plt
+    plt + lims(x= c(0, 15), y = c(0,100))
   })
   
   output$flip_tracker_1 <- renderImage({
