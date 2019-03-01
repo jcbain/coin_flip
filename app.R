@@ -13,7 +13,7 @@ flips <- crossing(trial = 1:1000, flip = 1:100) %>%
 
 
 ui <- cartridge(
-  "Flipity Flip",
+  "Flip Flip",
   tags$style(HTML(
     "body {max-width: 900px; margin: auto;}
     @media only screen and (max-width:800px) {
@@ -26,25 +26,20 @@ ui <- cartridge(
     h1 {
     font-size: 19px;
     }
+    #flip_image{
+    height: 20px;
+    }
     }
     "
   )),
   tags$head(HTML(
     '
-    <title>Trump Twitter Time!</title>
+    <title>Flipity Flip!</title>
+    <link rel="stylesheet" type="text/css" href="static/style.css">
+
     ')),
   
   cartridge(
-  title = "{nessy}",
-  container_with_title(
-    title = "Buttons",
-    button("Normal", "Flip"),
-    button_primary("Primary", "Primary"),
-    button_success("Success", "Success"),
-    button_warning("Warning", "Warning"),
-    button_error("Error", "Error"),
-    radio_buttons("sure", "Are you sure?", c("yes", "no"))
-  ),
   cartridge(title= "something"),
   container_with_title(
     title = "params",
@@ -74,9 +69,10 @@ ui <- cartridge(
     uiOutput("doge_image")
   ),
   container(
-    container(imageOutput("flip_image")),
+    container(imageOutput("flip_image", height = "175px")),
     button_primary("flip", "flipity")
-  )
+  ),
+  container(plotOutput("flip_collection"))
 ))
 
 server <- function(input, output) {
