@@ -110,6 +110,13 @@ server <- function(input, output) {
     all_flips
   })
   
+  #flip_tally <- eventReactive(input$flip, {
+   # need to check first instances of true hh +1 and true ht + 1 
+   # next summarize action look at temp action
+   # generate histogram
+   # change to next trial
+  #})
+  
   # Generate a series of random flips
   ## used in bar chart section
   tmp_dat <- reactive({
