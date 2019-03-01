@@ -91,6 +91,7 @@ server <- function(input, output) {
   flip_count <- reactiveVal(1)
   flip_count2 <- reactiveVal(1)
   flip_count3 <- reactiveVal(1)
+  flip_count4 <- reactiveVal(1)
   trial_index <- reactiveVal(1)
   condition_met <- reactiveVal(FALSE)
 
@@ -133,9 +134,8 @@ server <- function(input, output) {
         flip_count(1L)
         flip_count2(1L)
         flip_count3(1L)
+        flip_count4(1L)
       
-        #lapply(all_flips, function(x){x = "empty"})
-        #all_flips[["flip_2"]]<-"empty"
         purrr::map(1:15, .f = function(x){
           v <- paste0("flip_", x)
           all_flips[[v]] <- "empty"
@@ -179,6 +179,16 @@ server <- function(input, output) {
       geom_bar(aes("first ht", first_ht), stat = 'identity') +
       theme_bw()
     })
+  
+  output$flip_collection <- renderPlot({
+    pre_tmp <- flips %>% filter(trial < trial_index())
+    cur_tmp <- trial_data()  %>% head(flip_count4())
+    tmp <- bind_rows(pre_tmp, cur_tmp) %>% 
+      group_by(trial) %>% summarize(first_hh = which(hh)[1] + 1)
+    plt <- ggplot(data = tmp, aes(x = first_hh)) + theme_bw()
+    
+    plt
+  })
   
   output$flip_tracker_1 <- renderImage({
     if (flip_gatherer()[['flip_1']]=="empty")
