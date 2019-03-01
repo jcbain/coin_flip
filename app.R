@@ -120,7 +120,6 @@ server <- function(input, output) {
     all_flips[[flip_index]] <- flip()
     flip_count2(flip_count2() + 1L)
     #trial_reset()
-    
     all_flips
   })
   
@@ -147,8 +146,8 @@ server <- function(input, output) {
         }}
     flip_count3(flip_count3() + 1L)
     flip_count4(flip_count4() + 1L)
+    
   })
-  
   
   #flip_tally <- eventReactive(input$flip, {
    # need to check first instances of true hh +1 and true ht + 1 
@@ -183,12 +182,24 @@ server <- function(input, output) {
   
   output$flip_collection <- renderPlot({
     pre_tmp <- flips %>% filter(trial < trial_index())
-    cur_tmp <- trial_data() %>% head(flip_count4())
+    cur_tmp <- trial_data() %>% head(flip_count4() -1)
     tmp <- bind_rows(pre_tmp, cur_tmp) %>% 
-      group_by(trial) %>% summarize(first_hh = which(hh)[1] + 1)
-    plt <- ggplot(data = tmp, aes(x = first_hh)) + geom_histogram() + theme_bw()
+      group_by(trial) %>% summarize(first_hh = which(hh)[1] + 1,
+                                    first_ht = which(ht)[1] + 1)
+    hh_mean <- mean(tmp$first_hh, na.rm = T)
+    ht_mean <- mean(tmp$first_ht, na.rm = T)
+    plt <- ggplot(data = tmp) + geom_histogram(aes(x = first_hh), 
+                                               fill = "#bc5090",
+                                               binwidth = 1,
+                                               alpha = .5) + 
+      geom_histogram(aes(x = first_ht), fill = "#ffa600",
+                     binwidth = 1,
+                     alpha = .5) +
+      geom_vline(xintercept = hh_mean, color = "#bc5090") +
+      geom_vline(xintercept = ht_mean, color = "#ffa600") + 
+      theme_bw()
     
-    plt + lims(x= c(0, 15), y = c(0,100))
+    plt + lims(x= c(0, 15), y = c(0,20))
   })
   
   output$flip_tracker_1 <- renderImage({
