@@ -13,6 +13,28 @@ flips <- crossing(trial = 1:1000, flip = 1:100) %>%
 
 
 ui <- cartridge(
+  "Flipity Flip",
+  tags$style(HTML(
+    "body {max-width: 900px; margin: auto;}
+    @media only screen and (max-width:800px) {
+    body {
+    font-size: 10px;
+    }
+    html {
+    font-size: 10px;
+    }
+    h1 {
+    font-size: 19px;
+    }
+    }
+    "
+  )),
+  tags$head(HTML(
+    '
+    <title>Trump Twitter Time!</title>
+    ')),
+  
+  cartridge(
   title = "{nessy}",
   container_with_title(
     title = "Buttons",
@@ -34,7 +56,19 @@ ui <- cartridge(
   container(
     imageOutput("flip_tracker_1", width = "2%", inline = T, height = "20px"),
     imageOutput("flip_tracker_2", width = "2%", inline = T, height = "20px"),
-    imageOutput("flip_tracker_3", width = "2%", inline = T, height = "20px")
+    imageOutput("flip_tracker_3", width = "2%", inline = T, height = "20px"),
+    imageOutput("flip_tracker_4", width = "2%", inline = T, height = "20px"),
+    imageOutput("flip_tracker_5", width = "2%", inline = T, height = "20px"),
+    imageOutput("flip_tracker_6", width = "2%", inline = T, height = "20px"),
+    imageOutput("flip_tracker_7", width = "2%", inline = T, height = "20px"),
+    imageOutput("flip_tracker_8", width = "2%", inline = T, height = "20px"),
+    imageOutput("flip_tracker_9", width = "2%", inline = T, height = "20px"),
+    imageOutput("flip_tracker_10", width = "2%", inline = T, height = "20px"),
+    imageOutput("flip_tracker_11", width = "2%", inline = T, height = "20px"),
+    imageOutput("flip_tracker_12", width = "2%", inline = T, height = "20px"),
+    imageOutput("flip_tracker_13", width = "2%", inline = T, height = "20px"),
+    imageOutput("flip_tracker_14", width = "2%", inline = T, height = "20px"),
+    imageOutput("flip_tracker_15", width = "2%", inline = T, height = "20px")
   ),
   container(
     uiOutput("doge_image")
@@ -43,10 +77,19 @@ ui <- cartridge(
     container(imageOutput("flip_image")),
     button_primary("flip", "flipity")
   )
-)
+))
 
-server <- function(input, output, session) {
-  all_flips <- reactiveValues('flip_1' = 'empty', 'flip_2' = 'empty')
+server <- function(input, output) {
+  heads <- "www/heads.gif"
+  
+  all_flips <- reactiveValues('flip_1' = 'empty', 'flip_2' = 'empty', 
+                              'flip_3' = 'empty', 'flip_4' = 'empty',
+                              'flip_5' = 'empty', 'flip_6' = 'empty',
+                              'flip_7' = 'empty', 'flip_8' = 'empty',
+                              'flip_9' = 'empty', 'flip_10' = 'empty',
+                              'flip_11' = 'empty', 'flip_12' = 'empty',
+                              'flip_13' = 'empty', 'flip_14' = 'empty',
+                              'flip_15' = 'empty')
   # current flip count
   flip_count <- reactiveVal(1)
   flip_count2 <- reactiveVal(1)
@@ -113,8 +156,8 @@ server <- function(input, output, session) {
       ))
     } else {
       return(list(
-        src = "www/bitcoins.png",
-        filetype = "image/png",
+        src = heads,
+        filetype = "image/gif",
         width = 40,
         height = 40,
         alt = "tails"
@@ -140,18 +183,78 @@ server <- function(input, output, session) {
       ))
     } else {
       return(list(
-        src = "www/bitcoins.png",
-        filetype = "image/png",
+        src = heads,
+        filetype = "image/gif",
         width = 40,
         height = 40,
         alt = "tails"
       ))
     }}, deleteFile = FALSE)
   
-  output$flip_image <- renderImage({
-    if (is.null(flip_event()))
-      return(NULL)
-    if (flip_event() %>% tail(1) %>% pull(heads) == 0) {
+  output$flip_tracker_3 <- renderImage({
+    if (flip_gatherer()[['flip_3']]=="empty")
+      return(list(
+        src = "www/grey-circle-png-1.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "none"
+      ))
+    if (flip_gatherer()[["flip_3"]] == 0) {
+      return(list(
+        src = "www/dogecoin-png-5.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "heads"
+      ))
+    } else {
+      return(list(
+        src = heads,
+        filetype = "image/gif",
+        width = 40,
+        height = 40,
+        alt = "tails"
+      ))
+    }}, deleteFile = FALSE)
+  
+  output$flip_tracker_4 <- renderImage({
+    if (flip_gatherer()[['flip_4']]=="empty")
+      return(list(
+        src = "www/grey-circle-png-1.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "none"
+      ))
+    if (flip_gatherer()[["flip_4"]] == 0) {
+      return(list(
+        src = "www/dogecoin-png-5.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "heads"
+      ))
+    } else {
+      return(list(
+        src = heads,
+        filetype = "image/gif",
+        width = 40,
+        height = 40,
+        alt = "tails"
+      ))
+    }}, deleteFile = FALSE)
+  
+  output$flip_tracker_5 <- renderImage({
+    if (flip_gatherer()[['flip_5']]=="empty")
+      return(list(
+        src = "www/grey-circle-png-1.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "none"
+      ))
+    if (flip_gatherer()[["flip_5"]] == 0) {
       return(list(
         src = "www/dogecoin-png-5.png",
         filetype = "image/png",
@@ -169,15 +272,308 @@ server <- function(input, output, session) {
       ))
     }}, deleteFile = FALSE)
   
+  output$flip_tracker_6 <- renderImage({
+    if (flip_gatherer()[['flip_6']]=="empty")
+      return(list(
+        src = "www/grey-circle-png-1.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "none"
+      ))
+    if (flip_gatherer()[["flip_6"]] == 0) {
+      return(list(
+        src = "www/dogecoin-png-5.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "heads"
+      ))
+    } else {
+      return(list(
+        src = "www/bitcoins.png",
+        filetype = "image/png",
+        width = 40,
+        height = 40,
+        alt = "tails"
+      ))
+    }}, deleteFile = FALSE)
+  
+  output$flip_tracker_7 <- renderImage({
+    if (flip_gatherer()[['flip_7']]=="empty")
+      return(list(
+        src = "www/grey-circle-png-1.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "none"
+      ))
+    if (flip_gatherer()[["flip_7"]] == 0) {
+      return(list(
+        src = "www/dogecoin-png-5.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "heads"
+      ))
+    } else {
+      return(list(
+        src = "www/bitcoins.png",
+        filetype = "image/png",
+        width = 40,
+        height = 40,
+        alt = "tails"
+      ))
+    }}, deleteFile = FALSE)
+  
+  output$flip_tracker_8 <- renderImage({
+    if (flip_gatherer()[['flip_8']]=="empty")
+      return(list(
+        src = "www/grey-circle-png-1.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "none"
+      ))
+    if (flip_gatherer()[["flip_8"]] == 0) {
+      return(list(
+        src = "www/dogecoin-png-5.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "heads"
+      ))
+    } else {
+      return(list(
+        src = "www/bitcoins.png",
+        filetype = "image/png",
+        width = 40,
+        height = 40,
+        alt = "tails"
+      ))
+    }}, deleteFile = FALSE)
+  
+  output$flip_tracker_9 <- renderImage({
+    if (flip_gatherer()[['flip_9']]=="empty")
+      return(list(
+        src = "www/grey-circle-png-1.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "none"
+      ))
+    if (flip_gatherer()[["flip_9"]] == 0) {
+      return(list(
+        src = "www/dogecoin-png-5.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "heads"
+      ))
+    } else {
+      return(list(
+        src = "www/bitcoins.png",
+        filetype = "image/png",
+        width = 40,
+        height = 40,
+        alt = "tails"
+      ))
+    }}, deleteFile = FALSE)
+  
+  output$flip_tracker_10 <- renderImage({
+    if (flip_gatherer()[['flip_10']]=="empty")
+      return(list(
+        src = "www/grey-circle-png-1.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "none"
+      ))
+    if (flip_gatherer()[["flip_10"]] == 0) {
+      return(list(
+        src = "www/dogecoin-png-5.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "heads"
+      ))
+    } else {
+      return(list(
+        src = "www/bitcoins.png",
+        filetype = "image/png",
+        width = 40,
+        height = 40,
+        alt = "tails"
+      ))
+    }}, deleteFile = FALSE)
+  
+  output$flip_tracker_11 <- renderImage({
+    if (flip_gatherer()[['flip_11']]=="empty")
+      return(list(
+        src = "www/grey-circle-png-1.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "none"
+      ))
+    if (flip_gatherer()[["flip_11"]] == 0) {
+      return(list(
+        src = "www/dogecoin-png-5.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "heads"
+      ))
+    } else {
+      return(list(
+        src = "www/bitcoins.png",
+        filetype = "image/png",
+        width = 40,
+        height = 40,
+        alt = "tails"
+      ))
+    }}, deleteFile = FALSE)
+  
+  output$flip_tracker_12 <- renderImage({
+    if (flip_gatherer()[['flip_12']]=="empty")
+      return(list(
+        src = "www/grey-circle-png-1.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "none"
+      ))
+    if (flip_gatherer()[["flip_12"]] == 0) {
+      return(list(
+        src = "www/dogecoin-png-5.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "heads"
+      ))
+    } else {
+      return(list(
+        src = "www/bitcoins.png",
+        filetype = "image/png",
+        width = 40,
+        height = 40,
+        alt = "tails"
+      ))
+    }}, deleteFile = FALSE)
+  
+  output$flip_tracker_13 <- renderImage({
+    if (flip_gatherer()[['flip_13']]=="empty")
+      return(list(
+        src = "www/grey-circle-png-1.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "none"
+      ))
+    if (flip_gatherer()[["flip_13"]] == 0) {
+      return(list(
+        src = "www/dogecoin-png-5.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "heads"
+      ))
+    } else {
+      return(list(
+        src = "www/bitcoins.png",
+        filetype = "image/png",
+        width = 40,
+        height = 40,
+        alt = "tails"
+      ))
+    }}, deleteFile = FALSE)
+  
+  output$flip_tracker_14 <- renderImage({
+    if (flip_gatherer()[['flip_14']]=="empty")
+      return(list(
+        src = "www/grey-circle-png-1.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "none"
+      ))
+    if (flip_gatherer()[["flip_14"]] == 0) {
+      return(list(
+        src = "www/dogecoin-png-5.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "heads"
+      ))
+    } else {
+      return(list(
+        src = "www/bitcoins.png",
+        filetype = "image/png",
+        width = 40,
+        height = 40,
+        alt = "tails"
+      ))
+    }}, deleteFile = FALSE)
+  
+  output$flip_tracker_15 <- renderImage({
+    if (flip_gatherer()[['flip_15']]=="empty")
+      return(list(
+        src = "www/grey-circle-png-1.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "none"
+      ))
+    if (flip_gatherer()[["flip_15"]] == 0) {
+      return(list(
+        src = "www/dogecoin-png-5.png",
+        filetype = "image/png",
+        width = 40,
+        height = 30,
+        alt = "heads"
+      ))
+    } else {
+      return(list(
+        src = "www/bitcoins.png",
+        filetype = "image/png",
+        width = 40,
+        height = 40,
+        alt = "tails"
+      ))
+    }}, deleteFile = FALSE)
+  
+  
+  output$flip_image <- renderImage({
+    if (is.null(flip_event()))
+      return(NULL)
+    if (flip_event() %>% tail(1) %>% pull(heads) == 0) {
+      return(list(
+        src = "www/bitcoins.png",
+        filetype = "image/png",
+        width = 128,
+        height = 128,
+        alt = "heads"
+      ))
+    } else {
+      return(list(
+        src = heads,
+        filetype = "image/gif",
+        width = 128,
+        height = 128,
+        alt = "tails"
+      ))
+    }}, deleteFile = FALSE)
+  
 
   output$doge_image <- renderUI({
     tagList(
-      balloon("Flip", style = "margin-left: 40px;"),
+      balloon("Flip", style = "margin-left: 440px;"),
       tags$br(),
-      tags$img(src = "www.rstudio.com")
+      tags$img(src = "doge.png", filetype = "image/png", height = "100px", 
+               style = "margin-left: 400px; width: 100px; float: right;")
     )
   })
   
 }
 
-#shiny::shinyApp(ui, server)
+shiny::shinyApp(ui, server)
