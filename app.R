@@ -72,7 +72,8 @@ ui <- cartridge(
     container(imageOutput("flip_image", height = "175px")),
     button_primary("flip", "flipity")
   ),
-  container(plotOutput("flip_collection"))
+  container(plotOutput("flip_collection", width = "40%"),
+            plotOutput("hnt_count", width = "40%"))
 ))
 
 server <- function(input, output) {
@@ -197,6 +198,20 @@ server <- function(input, output) {
                      alpha = .5) +
       geom_vline(xintercept = hh_mean, color = "#bc5090") +
       geom_vline(xintercept = ht_mean, color = "#ffa600") + 
+      theme_bw()
+    
+    plt + lims(x= c(0, 15), y = c(0,20))
+  })
+  
+  output$hnt_count <- renderPlot({
+    pre_tmp <- flips %>% filter(trial < trial_index())
+    cur_tmp <- trial_data() %>% head(flip_count4() -1)
+    tmp <- bind_rows(pre_tmp, cur_tmp) %>% 
+      mutate(cumsum_heads = cumsum(heads), n = row_number()) %>% 
+      mutate(cumsum_tails = n - cumsum_heads) %>% 
+      ungroup %>% select(n, cumsum_heads, cumsum_tails) %>% 
+      gather(side, count, -n)
+    plt <- ggplot(data = tmp) + geom_area(aes(x = n, y = count, fill = side), position = "fill") +
       theme_bw()
     
     plt + lims(x= c(0, 15), y = c(0,20))
