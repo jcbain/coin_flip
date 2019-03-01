@@ -90,25 +90,64 @@ server <- function(input, output) {
   # current flip count
   flip_count <- reactiveVal(1)
   flip_count2 <- reactiveVal(1)
+  flip_count3 <- reactiveVal(1)
+  trial_index <- reactiveVal(1)
+  condition_met <- reactiveVal(FALSE)
+
+  
+  trial_data <- reactive({
+    trial_flips <- flips %>% filter(trial == trial_index())
+    
+    trial_flips
+  })
+  
   
   # Actions that occur when flip button is pushed
   ## takes the first n rows determined by flip_count()
   ## increments flip_count() by 1
   flip_event <- eventReactive(input$flip, {
-    flip <- reactiveVal(flips %>% head(flip_count()))
+    flip <- reactiveVal(trial_data() %>% head(flip_count()))
     flip_count(flip_count() + 1L)
     
+    #trial_reset()
     flip()
   })
   
   flip_gatherer <- eventReactive(input$flip, {
     flip_index <- paste0("flip_", flip_count2())
-    flip <- reactiveVal(flips[flip_count2(),] %>% pull(heads))
+    flip <- reactiveVal(trial_data()[flip_count2(),] %>% pull(heads))
     all_flips[[flip_index]] <- flip()
     flip_count2(flip_count2() + 1L)
+    #trial_reset()
     
     all_flips
   })
+  
+  
+  observeEvent(input$flip, {
+    hh <- trial_data() %>% head(flip_count3()) %>% pull(hh)
+    ht <- trial_data() %>% head(flip_count3()) %>% pull(ht)
+    if (flip_count3()  > 1){
+      if (condition_met()){
+        trial_index(trial_index() + 1L)
+        flip_count(1L)
+        flip_count2(1L)
+        flip_count3(1L)
+      
+        #lapply(all_flips, function(x){x = "empty"})
+        #all_flips[["flip_2"]]<-"empty"
+        purrr::map(1:15, .f = function(x){
+          v <- paste0("flip_", x)
+          all_flips[[v]] <- "empty"
+          })
+        condition_met(FALSE)
+        }
+      else if((any(hh[1:flip_count3()-1]) == T & any(ht[1:flip_count3()-1]) == T)){
+        condition_met(TRUE)
+        }}
+    flip_count3(flip_count3() + 1L)
+  })
+  
   
   #flip_tally <- eventReactive(input$flip, {
    # need to check first instances of true hh +1 and true ht + 1 
