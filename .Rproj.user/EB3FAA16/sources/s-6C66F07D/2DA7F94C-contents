@@ -81,6 +81,7 @@ ui <- cartridge(
 
 server <- function(input, output) {
   heads <- "www/heads.gif"
+  tails <- "www/tails.gif"
   
   all_flips <- reactiveValues('flip_1' = 'empty', 'flip_2' = 'empty', 
                               'flip_3' = 'empty', 'flip_4' = 'empty',
@@ -143,15 +144,15 @@ server <- function(input, output) {
         src = "www/grey-circle-png-1.png",
         filetype = "image/png",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "none"
       ))
     if (flip_gatherer()[["flip_1"]] == 0) {
       return(list(
-        src = "www/dogecoin-png-5.png",
-        filetype = "image/png",
+        src = tails,
+        filetype = "image/gif",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "heads"
       ))
     } else {
@@ -170,15 +171,15 @@ server <- function(input, output) {
         src = "www/grey-circle-png-1.png",
         filetype = "image/png",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "none"
       ))
     if (flip_gatherer()[["flip_2"]] == 0) {
       return(list(
-        src = "www/dogecoin-png-5.png",
-        filetype = "image/png",
+        src = tails,
+        filetype = "image/gif",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "heads"
       ))
     } else {
@@ -197,15 +198,15 @@ server <- function(input, output) {
         src = "www/grey-circle-png-1.png",
         filetype = "image/png",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "none"
       ))
     if (flip_gatherer()[["flip_3"]] == 0) {
       return(list(
-        src = "www/dogecoin-png-5.png",
-        filetype = "image/png",
+        src = tails,
+        filetype = "image/gif",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "heads"
       ))
     } else {
@@ -224,15 +225,15 @@ server <- function(input, output) {
         src = "www/grey-circle-png-1.png",
         filetype = "image/png",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "none"
       ))
     if (flip_gatherer()[["flip_4"]] == 0) {
       return(list(
-        src = "www/dogecoin-png-5.png",
-        filetype = "image/png",
+        src = tails,
+        filetype = "image/gif",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "heads"
       ))
     } else {
@@ -251,21 +252,21 @@ server <- function(input, output) {
         src = "www/grey-circle-png-1.png",
         filetype = "image/png",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "none"
       ))
     if (flip_gatherer()[["flip_5"]] == 0) {
       return(list(
-        src = "www/dogecoin-png-5.png",
-        filetype = "image/png",
+        src = tails,
+        filetype = "image/gif",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "heads"
       ))
     } else {
       return(list(
-        src = "www/bitcoins.png",
-        filetype = "image/png",
+        src = heads,
+        filetype = "image/gif",
         width = 40,
         height = 40,
         alt = "tails"
@@ -278,21 +279,21 @@ server <- function(input, output) {
         src = "www/grey-circle-png-1.png",
         filetype = "image/png",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "none"
       ))
     if (flip_gatherer()[["flip_6"]] == 0) {
       return(list(
-        src = "www/dogecoin-png-5.png",
-        filetype = "image/png",
+        src = tails,
+        filetype = "image/gif",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "heads"
       ))
     } else {
       return(list(
-        src = "www/bitcoins.png",
-        filetype = "image/png",
+        src = heads,
+        filetype = "image/gif",
         width = 40,
         height = 40,
         alt = "tails"
@@ -305,21 +306,21 @@ server <- function(input, output) {
         src = "www/grey-circle-png-1.png",
         filetype = "image/png",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "none"
       ))
     if (flip_gatherer()[["flip_7"]] == 0) {
       return(list(
-        src = "www/dogecoin-png-5.png",
-        filetype = "image/png",
+        src = tails,
+        filetype = "image/gif",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "heads"
       ))
     } else {
       return(list(
-        src = "www/bitcoins.png",
-        filetype = "image/png",
+        src = heads,
+        filetype = "image/gif",
         width = 40,
         height = 40,
         alt = "tails"
@@ -332,21 +333,21 @@ server <- function(input, output) {
         src = "www/grey-circle-png-1.png",
         filetype = "image/png",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "none"
       ))
     if (flip_gatherer()[["flip_8"]] == 0) {
       return(list(
-        src = "www/dogecoin-png-5.png",
-        filetype = "image/png",
+        src = tails,
+        filetype = "image/gif",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "heads"
       ))
     } else {
       return(list(
-        src = "www/bitcoins.png",
-        filetype = "image/png",
+        src = heads,
+        filetype = "image/gif",
         width = 40,
         height = 40,
         alt = "tails"
@@ -359,21 +360,21 @@ server <- function(input, output) {
         src = "www/grey-circle-png-1.png",
         filetype = "image/png",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "none"
       ))
     if (flip_gatherer()[["flip_9"]] == 0) {
       return(list(
-        src = "www/dogecoin-png-5.png",
-        filetype = "image/png",
+        src = tails,
+        filetype = "image/gif",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "heads"
       ))
     } else {
       return(list(
-        src = "www/bitcoins.png",
-        filetype = "image/png",
+        src = heads,
+        filetype = "image/gif",
         width = 40,
         height = 40,
         alt = "tails"
@@ -386,21 +387,21 @@ server <- function(input, output) {
         src = "www/grey-circle-png-1.png",
         filetype = "image/png",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "none"
       ))
     if (flip_gatherer()[["flip_10"]] == 0) {
       return(list(
-        src = "www/dogecoin-png-5.png",
-        filetype = "image/png",
+        src = tails,
+        filetype = "image/gif",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "heads"
       ))
     } else {
       return(list(
-        src = "www/bitcoins.png",
-        filetype = "image/png",
+        src = heads,
+        filetype = "image/gif",
         width = 40,
         height = 40,
         alt = "tails"
@@ -413,21 +414,21 @@ server <- function(input, output) {
         src = "www/grey-circle-png-1.png",
         filetype = "image/png",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "none"
       ))
     if (flip_gatherer()[["flip_11"]] == 0) {
       return(list(
-        src = "www/dogecoin-png-5.png",
-        filetype = "image/png",
+        src = tails,
+        filetype = "image/gif",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "heads"
       ))
     } else {
       return(list(
-        src = "www/bitcoins.png",
-        filetype = "image/png",
+        src = heads,
+        filetype = "image/gif",
         width = 40,
         height = 40,
         alt = "tails"
@@ -440,21 +441,21 @@ server <- function(input, output) {
         src = "www/grey-circle-png-1.png",
         filetype = "image/png",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "none"
       ))
     if (flip_gatherer()[["flip_12"]] == 0) {
       return(list(
-        src = "www/dogecoin-png-5.png",
-        filetype = "image/png",
+        src = tails,
+        filetype = "image/gif",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "heads"
       ))
     } else {
       return(list(
-        src = "www/bitcoins.png",
-        filetype = "image/png",
+        src = heads,
+        filetype = "image/gif",
         width = 40,
         height = 40,
         alt = "tails"
@@ -467,21 +468,21 @@ server <- function(input, output) {
         src = "www/grey-circle-png-1.png",
         filetype = "image/png",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "none"
       ))
     if (flip_gatherer()[["flip_13"]] == 0) {
       return(list(
-        src = "www/dogecoin-png-5.png",
-        filetype = "image/png",
+        src = tails,
+        filetype = "image/gif",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "heads"
       ))
     } else {
       return(list(
-        src = "www/bitcoins.png",
-        filetype = "image/png",
+        src = heads,
+        filetype = "image/gif",
         width = 40,
         height = 40,
         alt = "tails"
@@ -494,21 +495,21 @@ server <- function(input, output) {
         src = "www/grey-circle-png-1.png",
         filetype = "image/png",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "none"
       ))
     if (flip_gatherer()[["flip_14"]] == 0) {
       return(list(
-        src = "www/dogecoin-png-5.png",
-        filetype = "image/png",
+        src = tails,
+        filetype = "image/gif",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "heads"
       ))
     } else {
       return(list(
-        src = "www/bitcoins.png",
-        filetype = "image/png",
+        src = heads,
+        filetype = "image/gif",
         width = 40,
         height = 40,
         alt = "tails"
@@ -521,21 +522,21 @@ server <- function(input, output) {
         src = "www/grey-circle-png-1.png",
         filetype = "image/png",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "none"
       ))
     if (flip_gatherer()[["flip_15"]] == 0) {
       return(list(
-        src = "www/dogecoin-png-5.png",
-        filetype = "image/png",
+        src = tails,
+        filetype = "image/gif",
         width = 40,
-        height = 30,
+        height = 40,
         alt = "heads"
       ))
     } else {
       return(list(
-        src = "www/bitcoins.png",
-        filetype = "image/png",
+        src = heads,
+        filetype = "image/gif",
         width = 40,
         height = 40,
         alt = "tails"
@@ -548,7 +549,7 @@ server <- function(input, output) {
       return(NULL)
     if (flip_event() %>% tail(1) %>% pull(heads) == 0) {
       return(list(
-        src = "www/bitcoins.png",
+        src = tails,
         filetype = "image/png",
         width = 128,
         height = 128,
@@ -567,10 +568,10 @@ server <- function(input, output) {
 
   output$doge_image <- renderUI({
     tagList(
-      balloon("Flip", style = "margin-left: 440px;"),
+      balloon("Flip", side = "left", style = "margin-right: 300px; float:right;"),
       tags$br(),
-      tags$img(src = "doge.png", filetype = "image/png", height = "100px", 
-               style = "margin-left: 400px; width: 100px; float: right;")
+      tags$img(src = "chi.gif", filetype = "image/gif", height = "120px", 
+               style = "margin-left: 100px; width: 120px; float: right;")
     )
   })
   
