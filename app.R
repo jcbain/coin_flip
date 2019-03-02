@@ -221,9 +221,12 @@ server <- function(input, output) {
       ungroup %>% select(n, cumsum_heads, cumsum_tails) %>% 
       gather(side, count, -n)
     plt <- ggplot(data = tmp) + geom_area(aes(x = n, y = count, fill = side), position = "fill") +
+      geom_hline(yintercept = .5) +
+      scale_fill_manual(labels = c("heads", "tails"), values = c("#DAA520", "#C0C0C0")) +
       theme_bw()
     
-    plt 
+    plt + theme(legend.position = c(0.8, 0.8),
+                legend.background = element_rect(fill= alpha('white', 0.4)))
   })
   output$flip_collection <- renderPlot({
     ptlist <- list(flip_collection(), hnt_count())
