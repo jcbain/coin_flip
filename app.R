@@ -12,6 +12,12 @@ flips <- crossing(trial = 1:1000, flip = 1:100) %>%
          hh = heads & next_flip,
          ht = heads & !next_flip)
 
+textings <- tibble(sayings = c('Flip!!!', 'Again! Again!', 'Wowza!', 
+                               'Flip again!', "I'm betting heads next!",
+                               'Tails is in your future!', 'Is this coin weighted?',
+                               "There's a heads and another heads!", 
+                               "Look! A heads and then a tails!",
+                               "Whoa! Flip number "))
 
 ui <- cartridge(
   "Flip Flip",
@@ -93,6 +99,7 @@ server <- function(input, output) {
   flip_count2 <- reactiveVal(1)
   flip_count3 <- reactiveVal(1)
   flip_count4 <- reactiveVal(1)
+  flip_count5 <- reactiveVal(1)
   trial_index <- reactiveVal(1)
   condition_met <- reactiveVal(FALSE)
 
@@ -147,7 +154,18 @@ server <- function(input, output) {
         }}
     flip_count3(flip_count3() + 1L)
     flip_count4(flip_count4() + 1L)
+    flip_count5(flip_count5() + 1L)
     
+  })
+  
+  flip_saying <- reactive({
+    if (flip_count5() == 1){
+      text = textings$sayings[1]
+    }else{
+      rand_index <- sample(6)[1]
+      text = textings$sayings[rand_index]
+    }
+    text
   })
   
   # Generate a series of random flips
@@ -635,6 +653,7 @@ server <- function(input, output) {
   
   
   output$flip_image <- renderImage({
+    tag(
     if (is.null(flip_event()))
       return(NULL)
     if (flip_event() %>% tail(1) %>% pull(heads) == 0) {
@@ -653,15 +672,15 @@ server <- function(input, output) {
         height = 128,
         alt = "tails"
       ))
-    }}, deleteFile = FALSE)
+    })}, deleteFile = FALSE)
   
 
   output$doge_image <- renderUI({
     tagList(
-      balloon("Flip", side = "left", style = "margin-right: 300px; float:right;"),
+      balloon(flip_saying(), side = "left", style = "margin-left: 30px;"),
       tags$br(),
       tags$img(src = "chi.gif", filetype = "image/gif", height = "120px", 
-               style = "margin-left: 100px; width: 120px; float: right;")
+               style = "margin-left: 100px; width: 120px; float: left;")
     )
   })
   
