@@ -3,6 +3,7 @@ library(tidyr)
 library(dplyr)
 library(nessy)
 library(ggplot2)
+library(gridExtra)
 
 flips <- crossing(trial = 1:1000, flip = 1:100) %>%
   mutate(heads = rbinom(n(), 1, .5)) %>% 
@@ -174,6 +175,7 @@ server <- function(input, output) {
     tmp_flips
     })
   
+  
   output$plot2<-renderPlot({
     ggplot(tmp_dat()) +
       geom_bar(aes("first hh", first_hh), stat = 'identity') +
@@ -181,7 +183,7 @@ server <- function(input, output) {
       theme_bw()
     })
   
-  output$flip_collection <- renderPlot({
+  flip_collection <- reactive({
     pre_tmp <- flips %>% filter(trial < trial_index())
     cur_tmp <- trial_data() %>% head(flip_count4() -1)
     tmp <- bind_rows(pre_tmp, cur_tmp) %>% 
@@ -202,8 +204,7 @@ server <- function(input, output) {
     
     plt + lims(x= c(0, 15), y = c(0,20))
   })
-  
-  output$hnt_count <- renderPlot({
+  hnt_count <- reactive({
     pre_tmp <- flips %>% filter(trial < trial_index())
     cur_tmp <- trial_data() %>% head(flip_count4() -1)
     tmp <- bind_rows(pre_tmp, cur_tmp) %>% 
@@ -216,6 +217,46 @@ server <- function(input, output) {
     
     plt + lims(x= c(0, 15), y = c(0,20))
   })
+  output$flip_collection <- renderPlot({
+    ptlist <- list(flip_collection(), hnt_count())
+    grid.arrange(grobs=ptlist, ncol=length(ptlist))
+  })
+  
+  # output$flip_collection <- renderPlot({
+  #   pre_tmp <- flips %>% filter(trial < trial_index())
+  #   cur_tmp <- trial_data() %>% head(flip_count4() -1)
+  #   tmp <- bind_rows(pre_tmp, cur_tmp) %>% 
+  #     group_by(trial) %>% summarize(first_hh = which(hh)[1] + 1,
+  #                                   first_ht = which(ht)[1] + 1)
+  #   hh_mean <- mean(tmp$first_hh, na.rm = T)
+  #   ht_mean <- mean(tmp$first_ht, na.rm = T)
+  #   plt <- ggplot(data = tmp) + geom_histogram(aes(x = first_hh), 
+  #                                              fill = "#bc5090",
+  #                                              binwidth = 1,
+  #                                              alpha = .5) + 
+  #     geom_histogram(aes(x = first_ht), fill = "#ffa600",
+  #                    binwidth = 1,
+  #                    alpha = .5) +
+  #     geom_vline(xintercept = hh_mean, color = "#bc5090") +
+  #     geom_vline(xintercept = ht_mean, color = "#ffa600") + 
+  #     theme_bw()
+  #   
+  #   plt + lims(x= c(0, 15), y = c(0,20))
+  # })
+  # 
+  # output$hnt_count <- renderPlot({
+  #   pre_tmp <- flips %>% filter(trial < trial_index())
+  #   cur_tmp <- trial_data() %>% head(flip_count4() -1)
+  #   tmp <- bind_rows(pre_tmp, cur_tmp) %>% 
+  #     mutate(cumsum_heads = cumsum(heads), n = row_number()) %>% 
+  #     mutate(cumsum_tails = n - cumsum_heads) %>% 
+  #     ungroup %>% select(n, cumsum_heads, cumsum_tails) %>% 
+  #     gather(side, count, -n)
+  #   plt <- ggplot(data = tmp) + geom_area(aes(x = n, y = count, fill = side), position = "fill") +
+  #     theme_bw()
+  #   
+  #   plt + lims(x= c(0, 15), y = c(0,20))
+  # })
   
   output$flip_tracker_1 <- renderImage({
     if (flip_gatherer()[['flip_1']]=="empty")
