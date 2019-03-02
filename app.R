@@ -34,23 +34,6 @@ ui <- cartridge(
                   height = "20px")
     })
   ),
-    
-  #   imageOutput("flip_tracker_1", width = "2%", inline = T, height = "20px"),
-  #   imageOutput("flip_tracker_2", width = "2%", inline = T, height = "20px"),
-  #   imageOutput("flip_tracker_3", width = "2%", inline = T, height = "20px"),
-  #   imageOutput("flip_tracker_4", width = "2%", inline = T, height = "20px"),
-  #   imageOutput("flip_tracker_5", width = "2%", inline = T, height = "20px"),
-  #   imageOutput("flip_tracker_6", width = "2%", inline = T, height = "20px"),
-  #   imageOutput("flip_tracker_7", width = "2%", inline = T, height = "20px"),
-  #   imageOutput("flip_tracker_8", width = "2%", inline = T, height = "20px"),
-  #   imageOutput("flip_tracker_9", width = "2%", inline = T, height = "20px"),
-  #   imageOutput("flip_tracker_10", width = "2%", inline = T, height = "20px"),
-  #   imageOutput("flip_tracker_11", width = "2%", inline = T, height = "20px"),
-  #   imageOutput("flip_tracker_12", width = "2%", inline = T, height = "20px"),
-  #   imageOutput("flip_tracker_13", width = "2%", inline = T, height = "20px"),
-  #   imageOutput("flip_tracker_14", width = "2%", inline = T, height = "20px"),
-  #   imageOutput("flip_tracker_15", width = "2%", inline = T, height = "20px")
-  # ),
   container(
     uiOutput("doge_image"),
     button_primary("flip", "flipity")
@@ -63,10 +46,6 @@ ui <- cartridge(
     text_input("pick_number", "Pick-a-Number", value = "10"), 
     container(plotOutput("plot2", width = "100%"))
   ))
-  
-
-
-  
 ))
 
 server <- function(input, output) {
@@ -81,13 +60,16 @@ server <- function(input, output) {
                               'flip_11' = 'empty', 'flip_12' = 'empty',
                               'flip_13' = 'empty', 'flip_14' = 'empty',
                               'flip_15' = 'empty')
-  # current flip count
+  
+  # Counters 
+  ## flip_count --> current flip number
+  ## flip_count_for_tracker --> current flip tracker for the index tracker
+  ## trial_index --> current trial number
   flip_count <- reactiveVal(1)
-  flip_count2 <- reactiveVal(1)
-  flip_count3 <- reactiveVal(1)
-  flip_count4 <- reactiveVal(1)
-  flip_count5 <- reactiveVal(1)
+  flip_count_for_tracker <- reactiveVal(1)
   trial_index <- reactiveVal(1)
+  
+  # value to keep track of hh and ht conditions have been met
   condition_met <- reactiveVal(FALSE)
 
   
@@ -103,50 +85,44 @@ server <- function(input, output) {
   ## increments flip_count() by 1
   flip_event <- eventReactive(input$flip, {
     flip <- reactiveVal(trial_data() %>% head(flip_count()))
-    flip_count(flip_count() + 1L)
+    #flip_count(flip_count() + 1L)
     
     #trial_reset()
     flip()
   })
   
   flip_gatherer <- eventReactive(input$flip, {
-    flip_index <- paste0("flip_", flip_count2())
-    flip <- reactiveVal(trial_data()[flip_count2(),] %>% pull(heads))
+    flip_index <- paste0("flip_", flip_count_for_tracker())
+    flip <- reactiveVal(trial_data()[flip_count_for_tracker(),] %>% pull(heads))
     all_flips[[flip_index]] <- flip()
-    flip_count2(flip_count2() + 1L)
-    #trial_reset()
+    flip_count_for_tracker(flip_count_for_tracker() + 1L)
     all_flips
   })
   
   
   observeEvent(input$flip, {
-    hh <- trial_data() %>% head(flip_count3()) %>% pull(hh)
-    ht <- trial_data() %>% head(flip_count3()) %>% pull(ht)
-    if (flip_count3()  > 1){
+    hh <- trial_data() %>% head(flip_count()) %>% pull(hh)
+    ht <- trial_data() %>% head(flip_count()) %>% pull(ht)
+    if (flip_count()  > 1){
       if (condition_met()){
         trial_index(trial_index() + 1L)
         flip_count(1L)
-        flip_count2(1L)
-        flip_count3(1L)
-        flip_count4(1L)
+        flip_count_for_tracker(1L)
       
-        purrr::map(1:15, .f = function(x){
+        map(1:15, .f = function(x){
           v <- paste0("flip_", x)
           all_flips[[v]] <- "empty"
           })
         condition_met(FALSE)
         }
-      else if((any(hh[1:flip_count3()-1]) == T & any(ht[1:flip_count3()-1]) == T)){
+      else if((any(hh[1:flip_count()-1]) == T & any(ht[1:flip_count()-1]) == T)){
         condition_met(TRUE)
         }}
-    flip_count3(flip_count3() + 1L)
-    flip_count4(flip_count4() + 1L)
-    flip_count5(flip_count5() + 1L)
-    
+    flip_count(flip_count() + 1L)
   })
   
   flip_saying <- reactive({
-    if (flip_count5() == 1){
+    if (flip_count() == 1){
       text = textings$sayings[1]
     }else{
       rand_index <- sample(6)[1]
@@ -183,7 +159,7 @@ server <- function(input, output) {
   # Generate the plots for the individual filps
   flip_collection <- reactive({
     pre_tmp <- flips %>% filter(trial < trial_index())
-    cur_tmp <- trial_data() %>% head(flip_count4() -1)
+    cur_tmp <- trial_data() %>% head(flip_count() -1)
     tmp <- bind_rows(pre_tmp, cur_tmp) %>% 
       group_by(trial) %>% summarize(first_hh = which(hh)[1] + 1,
                                     first_ht = which(ht)[1] + 1)
@@ -213,7 +189,7 @@ server <- function(input, output) {
       mutate(lagmult = cs_laghh * cs_laght) %>% 
       mutate(cs_mat= case_when(lagmult == 0 ~ FALSE, lagmult > 0 ~ TRUE)) %>% 
       mutate(cs_mat = cumsum(cs_mat)) %>% filter(cs_mat <= 1)
-    cur_tmp <- trial_data() %>% head(flip_count4() -1)
+    cur_tmp <- trial_data() %>% head(flip_count() -1)
     tmp <- bind_rows(pre_tmp, cur_tmp) %>% ungroup() %>%
       mutate(cumsum_heads = cumsum(heads), n = row_number()) %>% 
       mutate(cumsum_tails = n - cumsum_heads) %>% 
@@ -232,6 +208,7 @@ server <- function(input, output) {
     grid.arrange(grobs=ptlist, ncol=length(ptlist))
   })
   
+  # function to choose heads or tails image 
   choose_heads_tails <- function(n){
     flip_num <- paste0("flip_", n)
     if(flip_gatherer()[[flip_num]] == "empty"){
@@ -287,29 +264,6 @@ server <- function(input, output) {
     )
     })
     
-  
-  # output$flip_image <- renderImage({
-  #   if (is.null(flip_event())){
-  #     return(NULL)
-  #   }else if (flip_event() %>% tail(1) %>% pull(heads) == 0) {
-  #     return(list(
-  #       src = tails,
-  #       filetype = "image/png",
-  #       width = 128,
-  #       height = 128,
-  #       alt = "heads"
-  #     ))
-  #   } else {
-  #     return(list(
-  #       src = heads,
-  #       filetype = "image/gif",
-  #       width = 128,
-  #       height = 128,
-  #       alt = "tails"
-  #     ))
-  #   }}, deleteFile = FALSE)
-  
-
   output$doge_image <- renderUI({
     tagList(
       balloon(flip_saying(), side = "left", style = "margin-left: 60px;"),
