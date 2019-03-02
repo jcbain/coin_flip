@@ -73,8 +73,7 @@ ui <- cartridge(
     container(imageOutput("flip_image", height = "175px")),
     button_primary("flip", "flipity")
   ),
-  container(plotOutput("flip_collection", width = "40%"),
-            plotOutput("hnt_count", width = "40%"))
+  container(plotOutput("flip_collection", width = "100%"))
 ))
 
 server <- function(input, output) {
@@ -205,9 +204,18 @@ server <- function(input, output) {
     plt + lims(x= c(0, 15), y = c(0,20))
   })
   hnt_count <- reactive({
-    pre_tmp <- flips %>% filter(trial < trial_index())
+    pre_tmp <- flips %>% filter(trial < trial_index()) %>% group_by(trial) %>%
+      mutate(lag_ht= (lag(ht)), lag_hh = lag(hh)) %>%
+      mutate(lag_ht = case_when(is.na(lag_ht) ~ FALSE, 
+                                !is.na(lag_ht) ~ lag_ht), 
+             lag_hh = case_when(is.na(lag_hh) ~ FALSE, 
+                                !is.na(lag_hh) ~ lag_hh)) %>% 
+      mutate(cs_laght = cumsum(lag_ht), cs_laghh = cumsum(lag_hh)) %>% 
+      mutate(lagmult = cs_laghh * cs_laght) %>% 
+      mutate(cs_mat= case_when(lagmult == 0 ~ FALSE, lagmult > 0 ~ TRUE)) %>% 
+      mutate(cs_mat = cumsum(cs_mat)) %>% filter(cs_mat <= 1)
     cur_tmp <- trial_data() %>% head(flip_count4() -1)
-    tmp <- bind_rows(pre_tmp, cur_tmp) %>% 
+    tmp <- bind_rows(pre_tmp, cur_tmp) %>% ungroup() %>%
       mutate(cumsum_heads = cumsum(heads), n = row_number()) %>% 
       mutate(cumsum_tails = n - cumsum_heads) %>% 
       ungroup %>% select(n, cumsum_heads, cumsum_tails) %>% 
@@ -215,48 +223,13 @@ server <- function(input, output) {
     plt <- ggplot(data = tmp) + geom_area(aes(x = n, y = count, fill = side), position = "fill") +
       theme_bw()
     
-    plt + lims(x= c(0, 15), y = c(0,20))
+    plt 
   })
   output$flip_collection <- renderPlot({
     ptlist <- list(flip_collection(), hnt_count())
     grid.arrange(grobs=ptlist, ncol=length(ptlist))
   })
   
-  # output$flip_collection <- renderPlot({
-  #   pre_tmp <- flips %>% filter(trial < trial_index())
-  #   cur_tmp <- trial_data() %>% head(flip_count4() -1)
-  #   tmp <- bind_rows(pre_tmp, cur_tmp) %>% 
-  #     group_by(trial) %>% summarize(first_hh = which(hh)[1] + 1,
-  #                                   first_ht = which(ht)[1] + 1)
-  #   hh_mean <- mean(tmp$first_hh, na.rm = T)
-  #   ht_mean <- mean(tmp$first_ht, na.rm = T)
-  #   plt <- ggplot(data = tmp) + geom_histogram(aes(x = first_hh), 
-  #                                              fill = "#bc5090",
-  #                                              binwidth = 1,
-  #                                              alpha = .5) + 
-  #     geom_histogram(aes(x = first_ht), fill = "#ffa600",
-  #                    binwidth = 1,
-  #                    alpha = .5) +
-  #     geom_vline(xintercept = hh_mean, color = "#bc5090") +
-  #     geom_vline(xintercept = ht_mean, color = "#ffa600") + 
-  #     theme_bw()
-  #   
-  #   plt + lims(x= c(0, 15), y = c(0,20))
-  # })
-  # 
-  # output$hnt_count <- renderPlot({
-  #   pre_tmp <- flips %>% filter(trial < trial_index())
-  #   cur_tmp <- trial_data() %>% head(flip_count4() -1)
-  #   tmp <- bind_rows(pre_tmp, cur_tmp) %>% 
-  #     mutate(cumsum_heads = cumsum(heads), n = row_number()) %>% 
-  #     mutate(cumsum_tails = n - cumsum_heads) %>% 
-  #     ungroup %>% select(n, cumsum_heads, cumsum_tails) %>% 
-  #     gather(side, count, -n)
-  #   plt <- ggplot(data = tmp) + geom_area(aes(x = n, y = count, fill = side), position = "fill") +
-  #     theme_bw()
-  #   
-  #   plt + lims(x= c(0, 15), y = c(0,20))
-  # })
   
   output$flip_tracker_1 <- renderImage({
     if (flip_gatherer()[['flip_1']]=="empty")
