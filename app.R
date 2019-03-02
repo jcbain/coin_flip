@@ -150,13 +150,6 @@ server <- function(input, output) {
     
   })
   
-  #flip_tally <- eventReactive(input$flip, {
-   # need to check first instances of true hh +1 and true ht + 1 
-   # next summarize action look at temp action
-   # generate histogram
-   # change to next trial
-  #})
-  
   # Generate a series of random flips
   ## used in bar chart section
   tmp_dat <- reactive({
@@ -182,6 +175,7 @@ server <- function(input, output) {
       theme_bw()
     })
   
+  # Generate the plots for the individual filps
   flip_collection <- reactive({
     pre_tmp <- flips %>% filter(trial < trial_index())
     cur_tmp <- trial_data() %>% head(flip_count4() -1)
