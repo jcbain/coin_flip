@@ -4,7 +4,9 @@ library(dplyr)
 library(nessy)
 library(ggplot2)
 library(gridExtra)
+library(purrr)
 
+# stat flip set
 flips <- crossing(trial = 1:1000, flip = 1:100) %>%
   mutate(heads = rbinom(n(), 1, .5)) %>% 
   group_by(trial) %>%
@@ -12,6 +14,7 @@ flips <- crossing(trial = 1:1000, flip = 1:100) %>%
          hh = heads & next_flip,
          ht = heads & !next_flip)
 
+# sayings for the smoking chihuahua 
 textings <- tibble(sayings = c('Flip!!!', 'Again! Again!', 'Wowza!', 
                                'Flip again!', "I'm betting heads next!",
                                'Tails is in your future!', 'Is this coin weighted?',
@@ -21,65 +24,49 @@ textings <- tibble(sayings = c('Flip!!!', 'Again! Again!', 'Wowza!',
 
 ui <- cartridge(
   "Flip Flip",
-  tags$style(HTML(
-    "body {max-width: 900px; margin: auto;}
-    @media only screen and (max-width:800px) {
-    body {
-    font-size: 10px;
-    }
-    html {
-    font-size: 10px;
-    }
-    h1 {
-    font-size: 19px;
-    }
-    #flip_image{
-    height: 20px;
-    }
-    }
-    "
-  )),
-  tags$head(HTML(
-    '
-    <title>Flipity Flip!</title>
-    <link rel="stylesheet" type="text/css" href="static/style.css">
-
-    ')),
-  
   cartridge(
-  cartridge(title= "something"),
+  cartridge(title = "flipity"),
+  container(
+    map(1:15, .f = function(x){
+      imageOutput(paste0("flip_tracker_", x),
+                  width = "2%",
+                  inline = TRUE,
+                  height = "20px")
+    })
+  ),
+    
+  #   imageOutput("flip_tracker_1", width = "2%", inline = T, height = "20px"),
+  #   imageOutput("flip_tracker_2", width = "2%", inline = T, height = "20px"),
+  #   imageOutput("flip_tracker_3", width = "2%", inline = T, height = "20px"),
+  #   imageOutput("flip_tracker_4", width = "2%", inline = T, height = "20px"),
+  #   imageOutput("flip_tracker_5", width = "2%", inline = T, height = "20px"),
+  #   imageOutput("flip_tracker_6", width = "2%", inline = T, height = "20px"),
+  #   imageOutput("flip_tracker_7", width = "2%", inline = T, height = "20px"),
+  #   imageOutput("flip_tracker_8", width = "2%", inline = T, height = "20px"),
+  #   imageOutput("flip_tracker_9", width = "2%", inline = T, height = "20px"),
+  #   imageOutput("flip_tracker_10", width = "2%", inline = T, height = "20px"),
+  #   imageOutput("flip_tracker_11", width = "2%", inline = T, height = "20px"),
+  #   imageOutput("flip_tracker_12", width = "2%", inline = T, height = "20px"),
+  #   imageOutput("flip_tracker_13", width = "2%", inline = T, height = "20px"),
+  #   imageOutput("flip_tracker_14", width = "2%", inline = T, height = "20px"),
+  #   imageOutput("flip_tracker_15", width = "2%", inline = T, height = "20px")
+  # ),
+  container(
+    uiOutput("doge_image"),
+    button_primary("flip", "flipity")
+  ),
+  container(
+    container(uiOutput("flip_image", height = "175px", width = "175px") ),
+    container(plotOutput("flip_collection", width = "100%")),
   container_with_title(
     title = "params",
     text_input("pick_number", "Pick-a-Number", value = "10"), 
-    container(plotOutput("plot2"))
-    
-  ),
-  cartridge(title = "flipity"),
-  container(
-    imageOutput("flip_tracker_1", width = "2%", inline = T, height = "20px"),
-    imageOutput("flip_tracker_2", width = "2%", inline = T, height = "20px"),
-    imageOutput("flip_tracker_3", width = "2%", inline = T, height = "20px"),
-    imageOutput("flip_tracker_4", width = "2%", inline = T, height = "20px"),
-    imageOutput("flip_tracker_5", width = "2%", inline = T, height = "20px"),
-    imageOutput("flip_tracker_6", width = "2%", inline = T, height = "20px"),
-    imageOutput("flip_tracker_7", width = "2%", inline = T, height = "20px"),
-    imageOutput("flip_tracker_8", width = "2%", inline = T, height = "20px"),
-    imageOutput("flip_tracker_9", width = "2%", inline = T, height = "20px"),
-    imageOutput("flip_tracker_10", width = "2%", inline = T, height = "20px"),
-    imageOutput("flip_tracker_11", width = "2%", inline = T, height = "20px"),
-    imageOutput("flip_tracker_12", width = "2%", inline = T, height = "20px"),
-    imageOutput("flip_tracker_13", width = "2%", inline = T, height = "20px"),
-    imageOutput("flip_tracker_14", width = "2%", inline = T, height = "20px"),
-    imageOutput("flip_tracker_15", width = "2%", inline = T, height = "20px")
-  ),
-  container(
-    uiOutput("doge_image")
-  ),
-  container(
-    container(imageOutput("flip_image", height = "175px")),
-    button_primary("flip", "flipity")
-  ),
-  container(plotOutput("flip_collection", width = "100%"))
+    container(plotOutput("plot2", width = "100%"))
+  ))
+  
+
+
+  
 ))
 
 server <- function(input, output) {
@@ -245,442 +232,90 @@ server <- function(input, output) {
     grid.arrange(grobs=ptlist, ncol=length(ptlist))
   })
   
-  
-  output$flip_tracker_1 <- renderImage({
-    if (flip_gatherer()[['flip_1']]=="empty")
-      return(list(
+  choose_heads_tails <- function(n){
+    flip_num <- paste0("flip_", n)
+    if(flip_gatherer()[[flip_num]] == "empty"){
+      img_list <- list(
         src = "www/grey-circle-png-1.png",
         filetype = "image/png",
         width = 40,
         height = 40,
-        alt = "none"
-      ))
-    if (flip_gatherer()[["flip_1"]] == 0) {
-      return(list(
-        src = tails,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "heads"
-      ))
-    } else {
-      return(list(
-        src = heads,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "tails"
-      ))
-    }}, deleteFile = FALSE)
+        alt = "blank_roll"
+      )
+    }else if(flip_gatherer()[[flip_num]] == 0){
+        img_list <- list(
+          src = tails,
+          filetype = "image/gif",
+          width = 40,
+          height = 40,
+          alt = "heads"
+        )
+    }else{
+        img_list <- list(
+          src = heads,
+          filetype = "image/gif",
+          width = 40,
+          height = 40,
+          alt = "tails"
+        )
+    }
+    img_list
+  }
   
-  output$flip_tracker_2 <- renderImage({
-    if (flip_gatherer()[['flip_2']]=="empty")
-      return(list(
-        src = "www/grey-circle-png-1.png",
-        filetype = "image/png",
-        width = 40,
-        height = 40,
-        alt = "none"
-      ))
-    if (flip_gatherer()[["flip_2"]] == 0) {
-      return(list(
-        src = tails,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "heads"
-      ))
-    } else {
-      return(list(
-        src = heads,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "tails"
-      ))
-    }}, deleteFile = FALSE)
-  
-  output$flip_tracker_3 <- renderImage({
-    if (flip_gatherer()[['flip_3']]=="empty")
-      return(list(
-        src = "www/grey-circle-png-1.png",
-        filetype = "image/png",
-        width = 40,
-        height = 40,
-        alt = "none"
-      ))
-    if (flip_gatherer()[["flip_3"]] == 0) {
-      return(list(
-        src = tails,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "heads"
-      ))
-    } else {
-      return(list(
-        src = heads,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "tails"
-      ))
-    }}, deleteFile = FALSE)
-  
-  output$flip_tracker_4 <- renderImage({
-    if (flip_gatherer()[['flip_4']]=="empty")
-      return(list(
-        src = "www/grey-circle-png-1.png",
-        filetype = "image/png",
-        width = 40,
-        height = 40,
-        alt = "none"
-      ))
-    if (flip_gatherer()[["flip_4"]] == 0) {
-      return(list(
-        src = tails,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "heads"
-      ))
-    } else {
-      return(list(
-        src = heads,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "tails"
-      ))
-    }}, deleteFile = FALSE)
-  
-  output$flip_tracker_5 <- renderImage({
-    if (flip_gatherer()[['flip_5']]=="empty")
-      return(list(
-        src = "www/grey-circle-png-1.png",
-        filetype = "image/png",
-        width = 40,
-        height = 40,
-        alt = "none"
-      ))
-    if (flip_gatherer()[["flip_5"]] == 0) {
-      return(list(
-        src = tails,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "heads"
-      ))
-    } else {
-      return(list(
-        src = heads,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "tails"
-      ))
-    }}, deleteFile = FALSE)
-  
-  output$flip_tracker_6 <- renderImage({
-    if (flip_gatherer()[['flip_6']]=="empty")
-      return(list(
-        src = "www/grey-circle-png-1.png",
-        filetype = "image/png",
-        width = 40,
-        height = 40,
-        alt = "none"
-      ))
-    if (flip_gatherer()[["flip_6"]] == 0) {
-      return(list(
-        src = tails,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "heads"
-      ))
-    } else {
-      return(list(
-        src = heads,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "tails"
-      ))
-    }}, deleteFile = FALSE)
-  
-  output$flip_tracker_7 <- renderImage({
-    if (flip_gatherer()[['flip_7']]=="empty")
-      return(list(
-        src = "www/grey-circle-png-1.png",
-        filetype = "image/png",
-        width = 40,
-        height = 40,
-        alt = "none"
-      ))
-    if (flip_gatherer()[["flip_7"]] == 0) {
-      return(list(
-        src = tails,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "heads"
-      ))
-    } else {
-      return(list(
-        src = heads,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "tails"
-      ))
-    }}, deleteFile = FALSE)
-  
-  output$flip_tracker_8 <- renderImage({
-    if (flip_gatherer()[['flip_8']]=="empty")
-      return(list(
-        src = "www/grey-circle-png-1.png",
-        filetype = "image/png",
-        width = 40,
-        height = 40,
-        alt = "none"
-      ))
-    if (flip_gatherer()[["flip_8"]] == 0) {
-      return(list(
-        src = tails,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "heads"
-      ))
-    } else {
-      return(list(
-        src = heads,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "tails"
-      ))
-    }}, deleteFile = FALSE)
-  
-  output$flip_tracker_9 <- renderImage({
-    if (flip_gatherer()[['flip_9']]=="empty")
-      return(list(
-        src = "www/grey-circle-png-1.png",
-        filetype = "image/png",
-        width = 40,
-        height = 40,
-        alt = "none"
-      ))
-    if (flip_gatherer()[["flip_9"]] == 0) {
-      return(list(
-        src = tails,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "heads"
-      ))
-    } else {
-      return(list(
-        src = heads,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "tails"
-      ))
-    }}, deleteFile = FALSE)
-  
-  output$flip_tracker_10 <- renderImage({
-    if (flip_gatherer()[['flip_10']]=="empty")
-      return(list(
-        src = "www/grey-circle-png-1.png",
-        filetype = "image/png",
-        width = 40,
-        height = 40,
-        alt = "none"
-      ))
-    if (flip_gatherer()[["flip_10"]] == 0) {
-      return(list(
-        src = tails,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "heads"
-      ))
-    } else {
-      return(list(
-        src = heads,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "tails"
-      ))
-    }}, deleteFile = FALSE)
-  
-  output$flip_tracker_11 <- renderImage({
-    if (flip_gatherer()[['flip_11']]=="empty")
-      return(list(
-        src = "www/grey-circle-png-1.png",
-        filetype = "image/png",
-        width = 40,
-        height = 40,
-        alt = "none"
-      ))
-    if (flip_gatherer()[["flip_11"]] == 0) {
-      return(list(
-        src = tails,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "heads"
-      ))
-    } else {
-      return(list(
-        src = heads,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "tails"
-      ))
-    }}, deleteFile = FALSE)
-  
-  output$flip_tracker_12 <- renderImage({
-    if (flip_gatherer()[['flip_12']]=="empty")
-      return(list(
-        src = "www/grey-circle-png-1.png",
-        filetype = "image/png",
-        width = 40,
-        height = 40,
-        alt = "none"
-      ))
-    if (flip_gatherer()[["flip_12"]] == 0) {
-      return(list(
-        src = tails,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "heads"
-      ))
-    } else {
-      return(list(
-        src = heads,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "tails"
-      ))
-    }}, deleteFile = FALSE)
-  
-  output$flip_tracker_13 <- renderImage({
-    if (flip_gatherer()[['flip_13']]=="empty")
-      return(list(
-        src = "www/grey-circle-png-1.png",
-        filetype = "image/png",
-        width = 40,
-        height = 40,
-        alt = "none"
-      ))
-    if (flip_gatherer()[["flip_13"]] == 0) {
-      return(list(
-        src = tails,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "heads"
-      ))
-    } else {
-      return(list(
-        src = heads,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "tails"
-      ))
-    }}, deleteFile = FALSE)
-  
-  output$flip_tracker_14 <- renderImage({
-    if (flip_gatherer()[['flip_14']]=="empty")
-      return(list(
-        src = "www/grey-circle-png-1.png",
-        filetype = "image/png",
-        width = 40,
-        height = 40,
-        alt = "none"
-      ))
-    if (flip_gatherer()[["flip_14"]] == 0) {
-      return(list(
-        src = tails,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "heads"
-      ))
-    } else {
-      return(list(
-        src = heads,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "tails"
-      ))
-    }}, deleteFile = FALSE)
-  
-  output$flip_tracker_15 <- renderImage({
-    if (flip_gatherer()[['flip_15']]=="empty")
-      return(list(
-        src = "www/grey-circle-png-1.png",
-        filetype = "image/png",
-        width = 40,
-        height = 40,
-        alt = "none"
-      ))
-    if (flip_gatherer()[["flip_15"]] == 0) {
-      return(list(
-        src = tails,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "heads"
-      ))
-    } else {
-      return(list(
-        src = heads,
-        filetype = "image/gif",
-        width = 40,
-        height = 40,
-        alt = "tails"
-      ))
-    }}, deleteFile = FALSE)
+  # dynamically create the coin tracker html object
+  map(1:15, .f = function(x){
+    tag_id <- paste0("flip_tracker_", x)
+    output[[tag_id]] <- renderImage({choose_heads_tails(x)}, deleteFile = FALSE)
+  })
   
   
-  output$flip_image <- renderImage({
-    tag(
-    if (is.null(flip_event()))
-      return(NULL)
-    if (flip_event() %>% tail(1) %>% pull(heads) == 0) {
-      return(list(
-        src = tails,
-        filetype = "image/png",
-        width = 128,
-        height = 128,
-        alt = "heads"
-      ))
-    } else {
-      return(list(
-        src = heads,
-        filetype = "image/gif",
-        width = 128,
-        height = 128,
-        alt = "tails"
-      ))
-    })}, deleteFile = FALSE)
+  flip_image <- reactive({
+    if(is.null(flip_event())){
+      pic <- NULL
+    }else if(flip_event() %>% tail(1) %>% pull(heads) == 0){
+      pic <- "tails.gif"
+    } else{
+      pic <- "heads.gif"
+    }
+    pic
+  })
+  
+  output$flip_image <- renderUI({
+    tags$div(class = "flip_image_div", height = "800px",
+      tags$img(src = flip_image(), filetype = "image/gif", height = "175px", 
+               style = "margin-right: 100px; width: 175px; float: right;")
+    )
+    })
+    
+  
+  # output$flip_image <- renderImage({
+  #   if (is.null(flip_event())){
+  #     return(NULL)
+  #   }else if (flip_event() %>% tail(1) %>% pull(heads) == 0) {
+  #     return(list(
+  #       src = tails,
+  #       filetype = "image/png",
+  #       width = 128,
+  #       height = 128,
+  #       alt = "heads"
+  #     ))
+  #   } else {
+  #     return(list(
+  #       src = heads,
+  #       filetype = "image/gif",
+  #       width = 128,
+  #       height = 128,
+  #       alt = "tails"
+  #     ))
+  #   }}, deleteFile = FALSE)
   
 
   output$doge_image <- renderUI({
     tagList(
-      balloon(flip_saying(), side = "left", style = "margin-left: 30px;"),
+      balloon(flip_saying(), side = "left", style = "margin-left: 60px;"),
       tags$br(),
-      tags$img(src = "chi.gif", filetype = "image/gif", height = "120px", 
-               style = "margin-left: 100px; width: 120px; float: left;")
+      tags$img(src = "chi_right.gif", filetype = "image/gif", height = "120px", 
+               style = "margin-left: 20px; width: 120px; float: left;")
     )
   })
   
