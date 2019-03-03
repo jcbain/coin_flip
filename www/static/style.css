@@ -1,0 +1,18 @@
+#flip_image{
+  height: 200px;
+  float: right;
+}
+
+#dog_box{
+  width : 50%;
+  float: left;
+  margin: 50px;
+}
+
+#flip_images{
+  margin-bottom: 100px;
+}
+
+#simulation_plots{
+  margin-top: 400px;
+}
