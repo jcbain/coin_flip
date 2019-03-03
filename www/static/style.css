@@ -1,6 +1,23 @@
+.container{
+  border-color: #003f5c;
+}
+
+.with-title{
+  border-color: #003f5c;
+}
+
+h1{
+  color: #ff6361;
+}
+
+p{
+  color: #ffa600;
+}
+
 #flip_image{
   height: 200px;
   float: right;
+  padding: 20px;
 }
 
 #dog_box{

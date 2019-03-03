@@ -6,6 +6,7 @@ library(ggplot2)
 library(gridExtra)
 library(purrr)
 
+
 # stat flip set
 flips <- crossing(trial = 1:1000, flip = 1:100) %>%
   mutate(heads = rbinom(n(), 1, .5)) %>% 
@@ -33,7 +34,17 @@ ui <- cartridge(
                        "Let's say you have a fair coin, one side is heads, the 
                        other is tails. Now, when flipping this coin, how many 
                        times would expect to flip the coin before you get a heads
-                       and then another heads?"),
+                       and then another heads?...
+
+                       That's the thing, on average it will take 6 flips. Think
+                       about that for a second. Now think about it after considering
+                       that, on average, it only takes four flips to get a heads then
+                       a tails. 
+
+                       Not wanting to work out the math but also don't want to take
+                       my word for it? Let's run some simulations then...
+                       Below is a fair coin flipper with a little added encouragment 
+                       from Cory the dog. Press the 'Flip the Coin' button below..."),
   container(
     map(1:max_tracked_flip, .f = function(x){
       imageOutput(paste0("flip_tracker_", x),
@@ -175,16 +186,32 @@ server <- function(input, output) {
                                     first_ht = which(ht)[1] + 1)
     hh_mean <- mean(tmp$first_hh, na.rm = T)
     ht_mean <- mean(tmp$first_ht, na.rm = T)
-    plt <- ggplot(data = tmp) + geom_histogram(aes(x = first_hh), 
-                                               fill = "#bc5090",
-                                               binwidth = 1,
-                                               alpha = .5) + 
-      geom_histogram(aes(x = first_ht), fill = "#ffa600",
+    plt <- ggplot(data = tmp) + 
+      geom_vline(xintercept = 6, color = "#ff6361", linetype = "dashed", alpha = .7) +
+      geom_vline(xintercept = 4, color = "#58508d", linetype = "dashed", alpha = .7) + 
+      geom_histogram(aes(x = first_hh), 
+                     fill = "#ff6361",
                      binwidth = 1,
-                     alpha = .5) +
-      geom_vline(xintercept = hh_mean, color = "#bc5090") +
-      geom_vline(xintercept = ht_mean, color = "#ffa600") + 
-      theme_bw()
+                     alpha = .7) + 
+      geom_histogram(aes(x = first_ht), fill = "#58508d",
+                     binwidth = 1,
+                     alpha = .7) +
+      geom_vline(xintercept = hh_mean, color = "#ff6361") +
+      geom_vline(xintercept = ht_mean, color = "#58508d") + 
+      geom_label(aes(hh_mean, y = 18), 
+                 label = paste0("mean hh: ", round(hh_mean, 2)), 
+                 label.size = NA,
+                 color = "#ff6361") +
+      geom_label(aes(ht_mean, y = 16), 
+                 label = paste0("mean ht: ", round(ht_mean, 2)), 
+                 label.size = NA,
+                 color = "#58508d") +
+      ggtitle("The Paradox in Simulations", 
+              subtitle = "Histograms of Occurences of HH and HT vs. the Number of Flips") + 
+      labs(x = "number of flips", y = "number of occurences") +
+      theme_bw() + 
+      theme(axis.title = element_text(color = "#ffa600"),
+            title = element_text(color = "#ffa600"))
     
     plt + lims(x= c(0, 15), y = c(0,20))
   })
@@ -208,7 +235,12 @@ server <- function(input, output) {
     plt <- ggplot(data = tmp) + geom_area(aes(x = n, y = count, fill = side), position = "fill") +
       geom_hline(yintercept = .5) +
       scale_fill_manual(labels = c("heads", "tails"), values = c("#DAA520", "#C0C0C0")) +
-      theme_bw()
+      ggtitle("Yeah...but is this a fair coin?", subtitle = "Percentage of Heads vs. Tails") +
+      labs(x = "number of flips", y = "percentage") + 
+      theme_bw() + 
+      theme(axis.title = element_text(color = "#ffa600"),
+            title = element_text(color = "#ffa600")) + 
+      scale_y_continuous(labels = scales::percent)
     
     plt + theme(legend.position = c(0.8, 0.8),
                 legend.background = element_rect(fill= alpha('white', 0.4)))
