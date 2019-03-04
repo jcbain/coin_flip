@@ -5,6 +5,41 @@ library(nessy)
 library(ggplot2)
 library(gridExtra)
 
+optimize_flips <- function(m, s, z){
+  z * s + m
+}
+
+analyze_flips <- function(n_heads, prob_heads) {
+  (prob_heads ^ (-n_heads) - 1)/(1 - prob_heads)
+}
+
+flip_generator <- function(n_heads = 2, prob_heads = .5){
+  mean_flips <- analyze_flips(n_heads, prob_heads)
+  max_flips <- round(optimize_flips(mean_flips, mean_flips, 8))
+  df <- crossing(trial = 1:1000, flip = 1:max_flips) %>% 
+    mutate(heads = rbinom(n(), 1, prob_heads)) %>%
+    group_by(trial)
+  
+  if (n_heads == 2){
+    df <- df %>% mutate(next_flip = lead(heads))
+  }else{
+    new_cols <- map(1: (n_heads -1), ~ df %>%
+        select(heads) %>% mutate(lead(heads, .x)) %>%
+        ungroup() %>%
+        select(`lead(heads, .x)`) %>%
+        set_names(paste0("next_flip", .x))) %>% 
+    bind_cols()
+  df <- bind_cols(df, new_cols)
+  }
+  df %>% gather(flip_ind, hort, -c(trial, flip)) %>% 
+    group_by(trial, flip) %>% summarize(condition_met = prod(hort)) %>%
+    ungroup %>%
+    group_by(trial) %>% summarize(first_cond = which(as.logical(condition_met))[1] + (n_heads - 1))
+}
+
+
+c(1:3) %>% map(~ flips %>% select(heads) %>% mutate(lead(heads, .x)) %>% ungroup() %>% select(`lead(heads, .x)`) %>% set_names(paste0("next_flip", .x))) %>% bind_cols()
+
 flips <- crossing(trial = 1:1000, flip = 1:100) %>%
   mutate(heads = rbinom(n(), 1, .5)) %>% 
   group_by(trial) %>%
