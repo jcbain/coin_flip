@@ -62,7 +62,8 @@ ui <- cartridge(
     tags$link(rel = "stylesheet", type = "text/css", href = "static/style.css")
   ),
   cartridge("The Heads-Heads Paradox",
-  container_with_title(title = "The paradox", title_tag = "p", 
+            container_with_title(title = "The paradox", 
+                                 title_tag = "p", 
                        "Let's say you have a fair coin, one side is heads, the 
                        other is tails. Now, when flipping this coin, how many 
                        times would expect to flip the coin before you get a heads
@@ -76,33 +77,50 @@ ui <- cartridge(
                        Not wanting to work out the math but also don't want to take
                        my word for it? Let's run some simulations then...
                        Below is a fair coin flipper with a little added encouragment 
-                       from Cory the dog. Press the 'Flip the Coin' button below..."),
-  container(
-    map(1:max_tracked_flip, .f = function(x){
-      imageOutput(paste0("flip_tracker_", x),
+                       from Cory the dog. Press the 'Flip the Coin' button below..."
+                       ),
+            container(
+              map(1:max_tracked_flip, .f = function(x){
+                imageOutput(paste0("flip_tracker_", x),
                   width = "2%",
                   inline = TRUE,
                   height = "20px")
-    })
-  ),
-  container(id = "dog_box",
-    uiOutput("dog_sprite"),
-    button_primary("flip_button", "Flip the Coin")
-  ),
-  container(id = "flip_images",
-    container(uiOutput("flip_image", height = "175px", width = "175px") ),
-    container(plotOutput("flip_collection", width = "100%")),
+                })
+              ),
+            container(id = "dog_box",
+                      uiOutput("dog_sprite"),
+                      button_primary("flip_button", "Flip the Coin")
+                      ),
+            container(id = "flip_images",
+                      container(uiOutput("flip_image", height = "175px", width = "175px")),
+                      container(plotOutput("flip_collection", width = "100%"))),
+            container(
+                      container(withMathJax(),
+                                helpText("Of course, this has an analytical solution
+                                              if you are into those sort of things. Without
+                                              getting into too much detail (because this is
+                                              more about learning by simulation), but for
+                                              two heads in a row $$H_2 = (1 + p)/p^2$$ where \\(p\\) 
+                                              is the probability of getting a heads in one flip. In 
+                                              the case above the coin is fair and therefore \\(p=0.5\\). 
+                                              Solving for this formula will result in a value of \\(6\\), 
+                                              which is, of course, our average number of flips it takes 
+                                              to get two heads in a row.")
+                                ),
+                      container(withMathJax(),
+                                helpText())
+                      ),
   container(id = "simulation_plots",
     container(id = "num_pick",
-      text_input("pick_number", "Number of heads in a row:", value = "2"),
-      width = "30%"
+              text_input("pick_number", "Number of heads in a row:", value = "2"),
+              width = "30%"
     ),
     container(id = "prob_pick",
     text_input("pick_prob", "Probability of heads:", value = ".5"),
     width = "30%"
     ),
     container(plotOutput("plot2", width = "100%"))
-  ))
+  )
 ))
 
 server <- function(input, output) {
