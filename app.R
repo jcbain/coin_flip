@@ -99,8 +99,9 @@ ui <- cartridge(
                                 helpText("Of course, this has an analytical solution
                                               if you are into those sort of things. Without
                                               getting into too much detail (because this is
-                                              more about learning by simulation), but for
-                                              two heads in a row $$H_2 = (1 + p)/p^2$$ where \\(p\\) 
+                                              more about learning by simulation), but to find the average
+                                              number of flips \\(X\\) for
+                                              two heads in a row $$X_2 = (1 + p)/p^2$$ where \\(p\\) 
                                               is the probability of getting a heads in one flip. In 
                                               the case above the coin is fair and therefore \\(p=0.5\\). 
                                               Solving for this formula will result in a value of \\(6\\), 
@@ -108,7 +109,10 @@ ui <- cartridge(
                                               to get two heads in a row.")
                                 ),
                       container(withMathJax(),
-                                helpText())
+                                helpText("With a little bit more work, this can be generalized to solve for any
+                                         number of \\(X_n\\) in a row with a slight tweak in the expression 
+                                         $$X = (p^{-n}-1)/(1-p)$$ where \\(n\\) is the number of heads in a row.
+                                         Again, we can simulate this below:"))
                       ),
   container(id = "simulation_plots",
     container(id = "num_pick",
@@ -231,7 +235,12 @@ server <- function(input, output) {
       geom_histogram(aes(first_cond)) +
       geom_vline(xintercept = observed_mean) +
       geom_vline(xintercept = analytic_mean, linetype = "dashed") + 
-      theme_bw()
+      labs(x = "number of flips", y = "number of occurences") +
+      ggtitle(paste0("Average number of times it takes to get ", input$pick_number, " in a row with a probability of ", input$pick_prob, " throwing a heads."),
+              subtitle = paste0("Analytical Mean: ", analytic_mean, "; Observed Mean: ", observed_mean)) +
+      theme_bw() +
+      theme(axis.title = element_text(color = "#ffa600"),
+            title = element_text(color = "#ffa600"))
     })
   
   # Generate the plots for the individual filps
