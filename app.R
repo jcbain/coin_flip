@@ -186,7 +186,11 @@ ui <- cartridge(
             )
   )
 
+# =========
+# SERVER
+# =========
 server <- function(input, output) {
+  # heads and tails sprites
   heads <- "www/heads.gif"
   tails <- "www/tails.gif"
   
@@ -246,7 +250,7 @@ server <- function(input, output) {
     flip <- reactiveVal(trial_data()[flip_count2(),] %>% pull(heads))
     all_flips[[flip_index]] <- flip()
     flip_count2(flip_count2() + 1L)
-    #trial_reset()
+
     all_flips
   })
   
@@ -275,7 +279,6 @@ server <- function(input, output) {
     flip_count3(flip_count3() + 1L)
     flip_count4(flip_count4() + 1L)
     flip_count5(flip_count5() + 1L)
-    
   })
   
   flip_saying <- reactive({
@@ -289,25 +292,6 @@ server <- function(input, output) {
     }
     text
   })
-  
-  output$plot2<-renderPlot({
-    dat <- sim_data()
-    observed_mean <- mean(dat$first_cond, na.rm = T)
-    analytic_mean <- analytical_mean()
-    ggplot(data = sim_data()) +
-      geom_histogram(aes(first_cond), fill = "#58508d") +
-      geom_vline(xintercept = observed_mean, color = "#003f5c") +
-      geom_vline(xintercept = analytic_mean, linetype = "dashed", color = "#ff6361") + 
-      labs(x = "number of flips", y = "number of occurences") +
-      #geom_label(aes(x = 20, y = 350), label = paste0("Analytical Mean: ", analytic_mean), color = "#ff6361", label.size = NA) +
-      #geom_label(aes(x = 20, y = 325),label = paste0("Observed Mean: ", observed_mean), color = "#003f5c", label.size = NA)
-      ggtitle(paste0("Average number of times it takes to get ", input$pick_number, " in a row with a probability of ", input$pick_prob, " throwing a heads."),
-              subtitle = paste0("Analytical Mean: ", analytic_mean, "; Observed Mean: ", observed_mean)) +
-      theme_bw() +
-      theme(axis.title = element_text(color = "#ffa600"),
-            title = element_text(color = "#ffa600", 
-                                 size = 15))
-    })
   
   # Generate the plots for the individual filps
   flip_collection <- reactive({
@@ -445,30 +429,7 @@ server <- function(input, output) {
                style = "margin-right: 100px; width: 175px;")
     )
     })
-    
   
-  # output$flip_image <- renderImage({
-  #   if (is.null(flip_event())){
-  #     return(NULL)
-  #   }else if (flip_event() %>% tail(1) %>% pull(heads) == 0) {
-  #     return(list(
-  #       src = tails,
-  #       filetype = "image/png",
-  #       width = 128,
-  #       height = 128,
-  #       alt = "heads"
-  #     ))
-  #   } else {
-  #     return(list(
-  #       src = heads,
-  #       filetype = "image/gif",
-  #       width = 128,
-  #       height = 128,
-  #       alt = "tails"
-  #     ))
-  #   }}, deleteFile = FALSE)
-  
-
   output$dog_sprite <- renderUI({
     tagList(
       balloon(flip_saying(), side = "left", style = "margin-left: 60px;"),
@@ -476,6 +437,23 @@ server <- function(input, output) {
       tags$img(src = "chi_right.gif", filetype = "image/gif", height = "120px", 
                style = "margin-left: 20px; width: 120px;")
     )
+  })
+  
+  output$plot2<-renderPlot({
+    dat <- sim_data()
+    observed_mean <- mean(dat$first_cond, na.rm = T)
+    analytic_mean <- analytical_mean()
+    ggplot(data = sim_data()) +
+      geom_histogram(aes(first_cond), fill = "#58508d") +
+      geom_vline(xintercept = observed_mean, color = "#003f5c") +
+      geom_vline(xintercept = analytic_mean, linetype = "dashed", color = "#ff6361") + 
+      labs(x = "number of flips", y = "number of occurences") +
+      ggtitle(paste0("Average number of times it takes to get ", input$pick_number, " in a row with a probability of ", input$pick_prob, " throwing a heads."),
+              subtitle = paste0("Analytical Mean: ", analytic_mean, "; Observed Mean: ", observed_mean)) +
+      theme_bw() +
+      theme(axis.title = element_text(color = "#ffa600"),
+            title = element_text(color = "#ffa600", 
+                                 size = 15))
   })
   
 }
