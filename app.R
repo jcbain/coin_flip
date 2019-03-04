@@ -232,15 +232,18 @@ server <- function(input, output) {
     observed_mean <- mean(dat$first_cond, na.rm = T)
     analytic_mean <- analytical_mean()
     ggplot(data = sim_data()) +
-      geom_histogram(aes(first_cond)) +
-      geom_vline(xintercept = observed_mean) +
-      geom_vline(xintercept = analytic_mean, linetype = "dashed") + 
+      geom_histogram(aes(first_cond), fill = "#58508d") +
+      geom_vline(xintercept = observed_mean, color = "#003f5c") +
+      geom_vline(xintercept = analytic_mean, linetype = "dashed", color = "#ff6361") + 
       labs(x = "number of flips", y = "number of occurences") +
+      #geom_label(aes(x = 20, y = 350), label = paste0("Analytical Mean: ", analytic_mean), color = "#ff6361", label.size = NA) +
+      #geom_label(aes(x = 20, y = 325),label = paste0("Observed Mean: ", observed_mean), color = "#003f5c", label.size = NA)
       ggtitle(paste0("Average number of times it takes to get ", input$pick_number, " in a row with a probability of ", input$pick_prob, " throwing a heads."),
               subtitle = paste0("Analytical Mean: ", analytic_mean, "; Observed Mean: ", observed_mean)) +
       theme_bw() +
       theme(axis.title = element_text(color = "#ffa600"),
-            title = element_text(color = "#ffa600"))
+            title = element_text(color = "#ffa600", 
+                                 size = 15))
     })
   
   # Generate the plots for the individual filps
@@ -270,6 +273,14 @@ server <- function(input, output) {
                  color = "#ff6361") +
       geom_label(aes(ht_mean, y = 16), 
                  label = paste0("mean ht: ", round(ht_mean, 2)), 
+                 label.size = NA,
+                 color = "#58508d") +
+      geom_label(aes(x = 6, y = 20), 
+                 label = "6", 
+                 label.size = NA,
+                 color = "#ff6361") +
+      geom_label(aes(x = 4, y = 20), 
+                 label = "4", 
                  label.size = NA,
                  color = "#58508d") +
       ggtitle("The Paradox in Simulations", 
