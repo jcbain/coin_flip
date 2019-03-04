@@ -5,9 +5,9 @@ account: hdiforecaster
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 759558
-bundleId: 1913189
+bundleId: 1913277
 url: https://jcbain.shinyapps.io/coin_flip/
-when: 1551677045.77259
+when: 1551682974.39465
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: .RData

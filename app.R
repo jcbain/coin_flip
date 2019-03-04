@@ -90,6 +90,27 @@ max_tracked_flip <- 15
 # UI
 # =======
 ui <- cartridge(
+  tags$style(HTML(
+    "body {max-width: 900px; margin: auto;}
+    @media only screen and (max-width:800px) {
+      body {
+        font-size: 10px;
+      }
+      html {
+        font-size: 10px;
+      }
+      h1 {
+        font-size: 19px;
+      }
+      #flip_collection{
+        margin-bottom: 600px;
+      }
+      .help-block{
+        margin-top: 200px;
+      }
+    }
+    "
+  )),
   # link to custom stylesheet for easier styling manipulation of the DOM
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "static/style.css")
