@@ -93,8 +93,14 @@ ui <- cartridge(
     container(uiOutput("flip_image", height = "175px", width = "175px") ),
     container(plotOutput("flip_collection", width = "100%")),
   container(id = "simulation_plots",
-    text_input("pick_number", "Number of heads in a row:", value = "2"), 
-    text_input("pick_prob", "Probability of heads after 1 toss:", value = ".5"),
+    container(id = "num_pick",
+      text_input("pick_number", "Number of heads in a row:", value = "2"),
+      width = "30%"
+    ),
+    container(id = "prob_pick",
+    text_input("pick_prob", "Probability of heads:", value = ".5"),
+    width = "30%"
+    ),
     container(plotOutput("plot2", width = "100%"))
   ))
 ))
@@ -198,24 +204,6 @@ server <- function(input, output) {
     }
     text
   })
-  
-  # Generate a series of random flips
-  ## used in bar chart section
-  # tmp_dat <- reactive({
-  #   tmp_flips <- crossing(trial = 1:input$pick_number, 
-  #                         flip = 1:100) %>%
-  #     mutate(heads = rbinom(n(), 1, .5)) %>% 
-  #     group_by(trial) %>%
-  #     mutate(next_flip = lead(heads),
-  #            hh = heads & next_flip,
-  #            ht = heads & !next_flip) %>%
-  #     summarize(first_hh = which(hh)[1] + 1,
-  #               first_ht = which(ht)[1] + 1) %>%
-  #     summarize(first_hh = mean(first_hh), first_ht = mean(first_ht))
-  #   
-  #   tmp_flips
-  #   })
-  
   
   output$plot2<-renderPlot({
     dat <- sim_data()

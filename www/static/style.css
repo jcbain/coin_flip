@@ -33,3 +33,22 @@ p{
 #simulation_plots{
   margin-top: 400px;
 }
+
+#num_pick{
+  float: right;
+  font-size: 10px;
+}
+
+#prob_pick{
+  float: left;
+  margin-right: 200px;
+  font-size: 10px;
+}
+
+#pick_number{
+  float: left;
+}
+
+.shiny-bound-input{
+  float: left;
+}
