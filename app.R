@@ -22,7 +22,7 @@ optimize_flips <- function(m, s, z){
 }
 
 analyze_flips <- function(n_heads, prob_heads) {
-  (prob_heads ^ (-n_heads) - 1)/(1 - prob_heads)
+  (prob_heads ^ (- n_heads) - 1)/(1 - prob_heads)
 }
 
 flip_generator <- function(n_heads = 2, prob_heads = .5){
@@ -93,7 +93,8 @@ ui <- cartridge(
     container(uiOutput("flip_image", height = "175px", width = "175px") ),
     container(plotOutput("flip_collection", width = "100%")),
   container(id = "simulation_plots",
-    text_input("pick_number", "Pick-a-Number", value = "10"), 
+    text_input("pick_number", "Number of heads in a row:", value = "2"), 
+    text_input("pick_prob", "Probability of heads after 1 toss:", value = ".5"),
     container(plotOutput("plot2", width = "100%"))
   ))
 ))
@@ -126,6 +127,20 @@ server <- function(input, output) {
     trial_flips
   })
   
+  # generate the simulated data
+  sim_data <- reactive({
+    pick_number <- as.numeric(input$pick_number)
+    pick_prob <- as.numeric(input$pick_prob)
+    flip_sims <- flip_generator(pick_number, pick_prob)
+    flip_sims
+  })
+  
+  analytical_mean <- reactive({
+    pick_number <- as.numeric(input$pick_number)
+    pick_prob <- as.numeric(input$pick_prob)
+    num <- analyze_flips(pick_number, pick_prob)
+    num
+  })
   
   # Actions that occur when flip button is pushed
   ## takes the first n rows determined by flip_count()
@@ -186,26 +201,30 @@ server <- function(input, output) {
   
   # Generate a series of random flips
   ## used in bar chart section
-  tmp_dat <- reactive({
-    tmp_flips <- crossing(trial = 1:input$pick_number, 
-                          flip = 1:100) %>%
-      mutate(heads = rbinom(n(), 1, .5)) %>% 
-      group_by(trial) %>%
-      mutate(next_flip = lead(heads),
-             hh = heads & next_flip,
-             ht = heads & !next_flip) %>%
-      summarize(first_hh = which(hh)[1] + 1,
-                first_ht = which(ht)[1] + 1) %>%
-      summarize(first_hh = mean(first_hh), first_ht = mean(first_ht))
-    
-    tmp_flips
-    })
+  # tmp_dat <- reactive({
+  #   tmp_flips <- crossing(trial = 1:input$pick_number, 
+  #                         flip = 1:100) %>%
+  #     mutate(heads = rbinom(n(), 1, .5)) %>% 
+  #     group_by(trial) %>%
+  #     mutate(next_flip = lead(heads),
+  #            hh = heads & next_flip,
+  #            ht = heads & !next_flip) %>%
+  #     summarize(first_hh = which(hh)[1] + 1,
+  #               first_ht = which(ht)[1] + 1) %>%
+  #     summarize(first_hh = mean(first_hh), first_ht = mean(first_ht))
+  #   
+  #   tmp_flips
+  #   })
   
   
   output$plot2<-renderPlot({
-    ggplot(tmp_dat()) +
-      geom_bar(aes("first hh", first_hh), stat = 'identity') +
-      geom_bar(aes("first ht", first_ht), stat = 'identity') +
+    dat <- sim_data()
+    observed_mean <- mean(dat$first_cond, na.rm = T)
+    analytic_mean <- analytical_mean()
+    ggplot(data = sim_data()) +
+      geom_histogram(aes(first_cond)) +
+      geom_vline(xintercept = observed_mean) +
+      geom_vline(xintercept = analytic_mean, linetype = "dashed") + 
       theme_bw()
     })
   
