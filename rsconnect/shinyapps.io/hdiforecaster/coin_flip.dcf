@@ -1,0 +1,13 @@
+name: coin_flip
+title: coin_flip
+username:
+account: hdiforecaster
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 759558
+bundleId: 1913162
+url: https://jcbain.shinyapps.io/coin_flip/
+when: 1551675185.6476
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .RData|app2.R

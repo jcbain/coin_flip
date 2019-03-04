@@ -6,25 +6,35 @@ library(ggplot2)
 library(gridExtra)
 library(purrr)
 
-
-# stat flip set
-flips <- crossing(trial = 1:1000, flip = 1:100) %>%
-  mutate(heads = rbinom(n(), 1, .5)) %>% 
-  group_by(trial) %>%
-  mutate(next_flip = lead(heads),
-         hh = heads & next_flip,
-         ht = heads & !next_flip)
-
-max_tracked_flip <- 15
-
+# ================
+# HELPER FUNCTIONS
+# ================
+#
+#' Function to optimize the number of flips necessary per trial.
+#' 
+#' @param m The mean number of flips.
+#' @param s The variance.
+#' @param z The z-score.
+#' @return numeric vaalue for the simulated number of flips necessary to ensure
+#'   the condition is met.
 optimize_flips <- function(m, s, z){
   z * s + m
 }
 
+#' Solve for the mean number of flips for a coin.
+#' 
+#' @param n_heads The number of heads wanted in a row.
+#' @param prob_heads The probability of tossing a heads.
+#' @return The analytical mean number of heads.
 analyze_flips <- function(n_heads, prob_heads) {
   (prob_heads ^ (- n_heads) - 1)/(1 - prob_heads)
 }
 
+#' Generate flips for any number of heads for any weigted coin.
+#' 
+#' @param n_heads The number of heads wanted in a row.
+#' @param prob_heads The probability of tossing a heads.
+#' @return a tibble with simulated flips.
 flip_generator <- function(n_heads = 2, prob_heads = .5){
   mean_flips <- analyze_flips(n_heads, prob_heads)
   max_flips <- round(optimize_flips(mean_flips, mean_flips, 8))
@@ -48,6 +58,17 @@ flip_generator <- function(n_heads = 2, prob_heads = .5){
     ungroup %>%
     group_by(trial) %>% summarize(first_cond = which(as.logical(condition_met))[1] + (n_heads - 1))
 }
+# ==========
+# DATA 
+# ==========
+# 
+# flip simulation data for heads and heads
+flips <- crossing(trial = 1:1000, flip = 1:100) %>%
+  mutate(heads = rbinom(n(), 1, .5)) %>% 
+  group_by(trial) %>%
+  mutate(next_flip = lead(heads),
+         hh = heads & next_flip,
+         ht = heads & !next_flip)
 
 # sayings for the smoking chihuahua 
 textings <- tibble(sayings = c('Flip!!!', 'Again! Again!', 'Wowza!', 
@@ -56,6 +77,15 @@ textings <- tibble(sayings = c('Flip!!!', 'Again! Again!', 'Wowza!',
                                "There's a heads and another heads!", 
                                "Look! A heads and then a tails!",
                                "Whoa! Flip number "))
+
+# =============
+# GLOBAL PARAMS
+# =============
+#
+# Set the max number of flips to track
+# TODO: This currently needs to be extended to manipulate the DOM
+max_tracked_flip <- 15
+
 
 ui <- cartridge(
   tags$head(
@@ -66,7 +96,7 @@ ui <- cartridge(
                                  title_tag = "p", 
                        "Let's say you have a fair coin, one side is heads, the 
                        other is tails. Now, when flipping this coin, how many 
-                       times would expect to flip the coin before you get a heads
+                       times would you expect to flip the coin before you get a heads
                        and then another heads?...
 
                        That's the thing, on average it will take 6 flips. Think
@@ -124,6 +154,23 @@ ui <- cartridge(
     width = "30%"
     ),
     container(plotOutput("plot2", width = "100%"))
+  ), 
+  tags$p(id = "closing",
+    "App created by",
+    tags$a(style = "color: #ff6e54;", href = "https://twitter.com/gymbrane", target = "_blank", HTML("&commat;gymbrane")),
+    "with a huge shout out to",
+    HTML(paste0(
+      tags$a(style = "color: #ff6e54;", href = "https://twitter.com/drob", target = "_blank", HTML("&commat;drob")), 
+      " and his ",
+      tags$a(style = "color: #ff6e54;", href = "https://twitter.com/drob/status/1008409373423611904?ref_src=twsrc%5Etfw%7Ctwcamp%5Etweetembed%7Ctwterm%5E1008939111925809153&ref_url=https%3A%2F%2Fjcbain.github.io%2Fportfolio%2Fcoin-flip-probs-go%2F", 
+                    "tweet", target = "_blank"), 
+      " that inspired it all, along with ",
+      tags$a(style = "color: #ff6e54;", href = "https://shiny.rstudio.com", "Shiny", target = "_blank"), " for providing the framework, and ",
+      tags$a(style = "color: #ff6e54;", href = "https://github.com/ColinFay/nessy", target = "_blank", "nessy"), " for providing the NES theme!")
+    ),
+    "And if you are looking for a more detailed dive into derving the analytical solution, this ",
+    tags$a(style = "color: #ff6e54;", href = "https://mindyourdecisions.com/blog/2015/02/16/monday-puzzle-two-heads-in-a-row/", "post", target = "_blank"),
+    " by Presh Talwalkar is super helpful!"
   )
 ))
 
@@ -148,7 +195,7 @@ server <- function(input, output) {
   trial_index <- reactiveVal(1)
   condition_met <- reactiveVal(FALSE)
 
-  
+  # filter by trial
   trial_data <- reactive({
     trial_flips <- flips %>% filter(trial == trial_index())
     
@@ -163,6 +210,7 @@ server <- function(input, output) {
     flip_sims
   })
   
+  # find the analy
   analytical_mean <- reactive({
     pick_number <- as.numeric(input$pick_number)
     pick_prob <- as.numeric(input$pick_prob)
@@ -201,6 +249,7 @@ server <- function(input, output) {
         flip_count2(1L)
         flip_count3(1L)
         flip_count4(1L)
+        flip_count5(1L)
       
         purrr::map(1:max_tracked_flip, .f = function(x){
           v <- paste0("flip_", x)
@@ -219,10 +268,12 @@ server <- function(input, output) {
   
   flip_saying <- reactive({
     if (flip_count5() == 1){
-      text = textings$sayings[1]
-    }else{
-      rand_index <- sample(6)[1]
-      text = textings$sayings[rand_index]
+      text <- textings$sayings[1]
+    }else if(flip_count5() <= 16){
+      rand_index <- sample(7)[1]
+      text <- textings$sayings[rand_index]
+    } else{
+      text <- paste0(textings$sayings[8], " ", flip_count5(), " times!")
     }
     text
   })
