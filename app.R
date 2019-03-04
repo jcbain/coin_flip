@@ -86,11 +86,15 @@ textings <- tibble(sayings = c('Flip!!!', 'Again! Again!', 'Wowza!',
 # TODO: This currently needs to be extended to manipulate the DOM
 max_tracked_flip <- 15
 
-
+# =======
+# UI
+# =======
 ui <- cartridge(
+  # link to custom stylesheet for easier styling manipulation of the DOM
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "static/style.css")
   ),
+  # first description of the paradox box
   cartridge("The Heads-Heads Paradox",
             container_with_title(title = "The paradox", 
                                  title_tag = "p", 
@@ -109,6 +113,7 @@ ui <- cartridge(
                        Below is a fair coin flipper with a little added encouragment 
                        from Cory the dog. Press the 'Flip the Coin' button below..."
                        ),
+            # container containing the simulated tracker of coin flips
             container(
               map(1:max_tracked_flip, .f = function(x){
                 imageOutput(paste0("flip_tracker_", x),
@@ -117,13 +122,16 @@ ui <- cartridge(
                   height = "20px")
                 })
               ),
+            # container with dog gif and sayings
             container(id = "dog_box",
                       uiOutput("dog_sprite"),
                       button_primary("flip_button", "Flip the Coin")
                       ),
+            # container with the main flip sprite
             container(id = "flip_images",
                       container(uiOutput("flip_image", height = "175px", width = "175px")),
                       container(plotOutput("flip_collection", width = "100%"))),
+            # analytical reasoning container
             container(
                       container(withMathJax(),
                                 helpText("Of course, this has an analytical solution
@@ -144,35 +152,39 @@ ui <- cartridge(
                                          $$X = (p^{-n}-1)/(1-p)$$ where \\(n\\) is the number of heads in a row.
                                          Again, we can simulate this below:"))
                       ),
-  container(id = "simulation_plots",
-    container(id = "num_pick",
-              text_input("pick_number", "Number of heads in a row:", value = "2"),
-              width = "30%"
-    ),
-    container(id = "prob_pick",
-    text_input("pick_prob", "Probability of heads:", value = ".5"),
-    width = "30%"
-    ),
-    container(plotOutput("plot2", width = "100%"))
-  ), 
-  tags$p(id = "closing",
-    "App created by",
-    tags$a(style = "color: #ff6e54;", href = "https://twitter.com/gymbrane", target = "_blank", HTML("&commat;gymbrane")),
-    "with a huge shout out to",
-    HTML(paste0(
-      tags$a(style = "color: #ff6e54;", href = "https://twitter.com/drob", target = "_blank", HTML("&commat;drob")), 
-      " and his ",
-      tags$a(style = "color: #ff6e54;", href = "https://twitter.com/drob/status/1008409373423611904?ref_src=twsrc%5Etfw%7Ctwcamp%5Etweetembed%7Ctwterm%5E1008939111925809153&ref_url=https%3A%2F%2Fjcbain.github.io%2Fportfolio%2Fcoin-flip-probs-go%2F", 
-                    "tweet", target = "_blank"), 
-      " that inspired it all, along with ",
-      tags$a(style = "color: #ff6e54;", href = "https://shiny.rstudio.com", "Shiny", target = "_blank"), " for providing the framework, and ",
-      tags$a(style = "color: #ff6e54;", href = "https://github.com/ColinFay/nessy", target = "_blank", "nessy"), " for providing the NES theme!")
-    ),
-    "And if you are looking for a more detailed dive into derving the analytical solution, this ",
-    tags$a(style = "color: #ff6e54;", href = "https://mindyourdecisions.com/blog/2015/02/16/monday-puzzle-two-heads-in-a-row/", "post", target = "_blank"),
-    " by Presh Talwalkar is super helpful!"
+            # simulation histograms for analytical solution section 
+            container(id = "simulation_plots",
+                      container(id = "num_pick",
+                                text_input("pick_number", "Number of heads in a row:",
+                                           value = "2"),
+                                width = "30%"
+                                ),
+                      container(id = "prob_pick",
+                                text_input("pick_prob", "Probability of heads:", 
+                                           value = ".5"),
+                                width = "30%"
+                                ),
+                      container(plotOutput("plot2", width = "100%"))
+                      ), 
+            # closing section: thank yous and the like
+            tags$p(id = "closing",
+                   "App created by",
+                   tags$a(style = "color: #ff6e54;", href = "https://twitter.com/gymbrane", target = "_blank", HTML("&commat;gymbrane")),
+                   "with a huge shout out to",
+                   HTML(paste0(
+                     tags$a(style = "color: #ff6e54;", href = "https://twitter.com/drob", target = "_blank", HTML("&commat;drob")), 
+                     " and his ",
+                     tags$a(style = "color: #ff6e54;", href = "https://twitter.com/drob/status/1008409373423611904?ref_src=twsrc%5Etfw%7Ctwcamp%5Etweetembed%7Ctwterm%5E1008939111925809153&ref_url=https%3A%2F%2Fjcbain.github.io%2Fportfolio%2Fcoin-flip-probs-go%2F", 
+                            "tweet", target = "_blank"), 
+                     " that inspired it all, along with ",
+                     tags$a(style = "color: #ff6e54;", href = "https://shiny.rstudio.com", "Shiny", target = "_blank"), " for providing the framework, and ",
+                     tags$a(style = "color: #ff6e54;", href = "https://github.com/ColinFay/nessy", target = "_blank", "nessy"), " for providing the NES theme!")
+                     ),
+                   "And if you are looking for a more detailed dive into derving the analytical solution, this ",
+                   tags$a(style = "color: #ff6e54;", href = "https://mindyourdecisions.com/blog/2015/02/16/monday-puzzle-two-heads-in-a-row/", "post", target = "_blank"),
+                   " by Presh Talwalkar is super helpful!")
+            )
   )
-))
 
 server <- function(input, output) {
   heads <- "www/heads.gif"
